@@ -1,0 +1,8 @@
+{
+    "baseApiHost": "http://127.0.0.1:5000",
+    "dropboxApiHost": "https://api.dropboxapi.com",
+    "dropboxAppKey": "y1amw5aqtb443qq",
+    "dropboxAppSecret": "rwotm4pvuqqs7bm",
+    "googleApisClientId": "81323692681-9p7e4grq66hg0omd5i90kr79e3tf4m44.apps.googleusercontent.com",
+    "googleApisClientSecret": "8PslpuJDYYX5jiAOG_YpIX9J"
+}
