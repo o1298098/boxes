@@ -2,11 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
-import "entries.dart";
+import 'metadata.dart';
 
 @immutable
 class DropboxFiles {
-  final List<Entries> entries;
+  final List<Metadata> entries;
   final String cursor;
   final bool hasMore;
 
@@ -25,7 +25,7 @@ class DropboxFiles {
     return DropboxFiles(
       entries: (json['entries'] as List)
           ?.map((e) =>
-              e == null ? null : Entries.fromJson(e as Map<String, dynamic>))
+              e == null ? null : Metadata.fromJson(e as Map<String, dynamic>))
           ?.toList(),
       cursor: json['cursor'] as String,
       hasMore: json['has_more'] as bool,
@@ -41,7 +41,7 @@ class DropboxFiles {
   }
 
   DropboxFiles copyWith({
-    List<Entries> entries,
+    List<Metadata> entries,
     String cursor,
     bool hasMore,
   }) {

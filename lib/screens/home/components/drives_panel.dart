@@ -6,7 +6,8 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class DrivesPanel extends StatelessWidget {
   final List<UserDrive> drives;
-  const DrivesPanel({this.drives = const []});
+  final Function(UserDrive) onTap;
+  const DrivesPanel({this.drives = const [], this.onTap});
   @override
   Widget build(BuildContext context) {
     return SliverStaggeredGrid.extentBuilder(
@@ -17,10 +18,9 @@ class DrivesPanel extends StatelessWidget {
       itemBuilder: (_, index) {
         final _d = drives[index];
         return DriveCell(
+          key: ValueKey(_d),
           drive: _d,
-          onTap: (d) async {
-            await Navigator.of(context).pushNamed('/folder', arguments: d);
-          },
+          onTap: onTap,
         );
       },
       itemCount: drives.length,

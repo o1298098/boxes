@@ -17,6 +17,18 @@
                 "--web-port",
                 "59341"
             ]
+        },
+        {
+            "name": "boxes(profile)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+        },
+        {
+            "name": "boxes(release)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
         }
     ]
 }

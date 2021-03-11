@@ -35,7 +35,7 @@ class BaseApi {
       "refreshToken": dropbox.refreshToken,
       "expiresIn": dropbox.expiresIn,
       "updateTime": DateTime.now().toIso8601String(),
-      "driveType": DriveType.dropbox.index + 1,
+      "driveType": DriveTypeEnum.dropbox.index + 1,
       "tokenTpe": dropbox.tokenType
     };
     return _http.request<UserDrive>(_url, method: "POST", data: _data);
@@ -52,8 +52,19 @@ class BaseApi {
       "refreshToken": dropbox.refreshToken,
       "expiresIn": dropbox.expiresIn,
       "updateTime": DateTime.now().toIso8601String(),
-      "driveType": DriveType.dropbox.index + 1
+      "driveType": DriveTypeEnum.dropbox.index + 1
     };
     return await _http.request<UserDrive>(_url, method: "POST", data: _data);
+  }
+
+  Future<ResponseModel> updateUserDrive(UserDrive drive) async {
+    final String _url = '/User/drive';
+    final _data = drive.toJson();
+    return await _http.request(_url, method: "PUT", data: _data);
+  }
+
+  Future<ResponseModel<UserDrive>> deleteUserDrive(int id) async {
+    final String _url = '/User/drive/$id';
+    return await _http.request<UserDrive>(_url, method: "DELETE");
   }
 }

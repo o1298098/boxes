@@ -1,5 +1,7 @@
 {
-    "baseApiHost": "http://127.0.0.1:5000",
+    "baseApiHost": "https://home.fluttermovie.top:5001",
+    "graphQLHttpLink": "https://home.fluttermovie.top:5001/graphql",
+    "graphQlWebSocketLink": "wss://home.fluttermovie.top:5001/ui/playground",
     "dropboxApiHost": "https://api.dropboxapi.com",
     "dropboxAppKey": "y1amw5aqtb443qq",
     "dropboxAppSecret": "rwotm4pvuqqs7bm",

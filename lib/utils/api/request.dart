@@ -1,14 +1,14 @@
 import 'package:boxes/models/model_factory.dart';
 import 'package:boxes/models/response_model.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_http_cache/dio_http_cache.dart';
+//import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flutter/foundation.dart';
 
 class Request {
   final String baseUrl;
   Dio _dio;
   Dio _tokenDio;
-  DioCacheManager _manager;
+  // DioCacheManager _manager;
   String _token;
   AsyncValueGetter<String> onRefreshToken;
   Request(this.baseUrl, {this.onRefreshToken}) {
@@ -27,7 +27,7 @@ class Request {
       Duration cacheDuration = const Duration(days: 1),
       Duration maxStale = const Duration(days: 30)}) async {
     try {
-      if (_manager != null) _dio.interceptors.remove(_manager.interceptor);
+      /* if (_manager != null) _dio.interceptors.remove(_manager.interceptor);
       if (cached) {
         _manager = DioCacheManager(
           CacheConfig(
@@ -37,7 +37,7 @@ class Request {
           ),
         );
         _dio.interceptors.add(_manager.interceptor);
-      }
+      }*/
       _dio.options.headers = {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "*",

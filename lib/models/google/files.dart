@@ -1,3 +1,5 @@
+import 'package:boxes/models/google/video_media_metadata.dart';
+
 import "capabilities.dart";
 import "export_links.dart";
 import "image_media_metadata.dart";
@@ -50,6 +52,7 @@ class Files {
   String size;
   String headRevisionId;
   ImageMediaMetadata imageMediaMetadata;
+  VideoMediaMetadata videoMediaMetadata;
 
   Files({
     this.kind,
@@ -96,6 +99,7 @@ class Files {
     this.size,
     this.headRevisionId,
     this.imageMediaMetadata,
+    this.videoMediaMetadata,
   });
 
   factory Files.fromJson(Map<String, dynamic> json) {
@@ -161,7 +165,13 @@ class Files {
       imageMediaMetadata: json['imageMediaMetadata'] == null
           ? null
           : ImageMediaMetadata.fromJson(
-              json['imageMediaMetadata'] as Map<String, dynamic>),
+              json['imageMediaMetadata'] as Map<String, dynamic>,
+            ),
+      videoMediaMetadata: json['videoMediaMetadata'] == null
+          ? null
+          : VideoMediaMetadata.fromJson(
+              json['videoMediaMetadata'] as Map<String, dynamic>,
+            ),
     );
   }
 
@@ -211,6 +221,7 @@ class Files {
       'size': size,
       'headRevisionId': headRevisionId,
       'imageMediaMetadata': imageMediaMetadata?.toJson(),
+      'videoMediaMetadata': videoMediaMetadata?.toJson(),
     };
   }
 }

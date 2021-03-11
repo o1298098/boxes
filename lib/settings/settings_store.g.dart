@@ -42,14 +42,14 @@ mixin _$SettingsStore on _SettingsStore, Store {
   final _$setDarkModeAsyncAction = AsyncAction('_SettingsStore.setDarkMode');
 
   @override
-  Future<void> setDarkMode({bool value}) {
+  Future<void> setDarkMode({@required bool value}) {
     return _$setDarkModeAsyncAction.run(() => super.setDarkMode(value: value));
   }
 
   final _$setAppUserAsyncAction = AsyncAction('_SettingsStore.setAppUser');
 
   @override
-  Future<void> setAppUser({User value}) {
+  Future<void> setAppUser({@required User value}) {
     return _$setAppUserAsyncAction.run(() => super.setAppUser(value: value));
   }
 

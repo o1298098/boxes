@@ -11,6 +11,10 @@ class ModelFactory {
         return DropboxFiles.fromJson(json) as T;
       case "GoogleFiles":
         return GoogleFiles.fromJson(json) as T;
+      case "DropBoxThumbnails":
+        return DropBoxThumbnails.fromJson(json) as T;
+      case 'Metadata':
+        return Metadata.fromJson(json) as T;
       default:
         return json;
     }

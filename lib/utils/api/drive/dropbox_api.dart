@@ -2,12 +2,15 @@ import 'dart:convert';
 
 import 'package:boxes/models/drive_file.dart';
 import 'package:boxes/models/drive_usage.dart';
+import 'package:boxes/models/dropbox/drop_box_thumbnails.dart';
 import 'package:boxes/models/dropbox/dropbox_files.dart';
+import 'package:boxes/models/enums/dirve_type_enum.dart';
 import 'package:boxes/models/models.dart';
 import 'package:boxes/models/response_model.dart';
 import 'package:boxes/settings/settings_store.dart';
 import 'package:boxes/utils/api/request.dart';
 import 'package:boxes/utils/app_config.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'drive_base_api.dart';
 
@@ -25,6 +28,14 @@ class DropboxApi extends DriveBaseApi {
   final Request _http = Request(AppConfig.instance.dropboxApiHost);
   UserDrive _userDropbox;
   SettingsStore store;
+
+  Future addDropbox(String uid, String driveName) async {
+    String _url =
+        'https://www.dropbox.com/oauth2/authorize?client_id=$_appKey&token_access_type=offline&&state=$uid-$driveName&redirect_uri=https%3A%2F%2Fhome.fluttermovie.top%3A5001%2Fuser%2Fdropbox&response_type=code';
+    if (await canLaunch(_url)) {
+      await launch(_url, forceWebView: true);
+    }
+  }
 
   ///This endpoint only applies to apps using the authorization code flow. An app calls this endpoint to acquire a bearer token once the user has authorized the app.
   ///
@@ -101,6 +112,7 @@ class DropboxApi extends DriveBaseApi {
 
   @override
   Future<DriveUsage> getSpaceUsage(UserDrive dropbox) async {
+    if (dropbox == null) return null;
     _userDropbox = dropbox;
     final String _url = '/2/users/get_space_usage';
     final _headers = {'Authorization': 'Bearer ${dropbox.accessToken}'};
@@ -110,7 +122,9 @@ class DropboxApi extends DriveBaseApi {
     if (_result.success) {
       var _data = _result.result;
       _usage = DriveUsage(
-          used: _data['used'], allocated: _data['allocation']['allocated']);
+          used: _data['used'],
+          allocated: _data['allocation']['allocated'],
+          lastUpdateTime: DateTime.now());
     }
     return _usage;
   }
@@ -122,7 +136,7 @@ class DropboxApi extends DriveBaseApi {
   ///For each DeletedMetadata, if your local state has something at the given path, remove it and all its children. If there's nothing at the given path, ignore this entry.
   ///Note: auth.RateLimitError may be returned if multiple list_folder or list_folder/continue calls with same parameters are made simultaneously by same API app for same user. If your app implements retry logic, please hold off the retry until the previous request finishes.
   @override
-  Future<List<DriveFile>> listFolder(
+  Future<DriveFilesResponse> listRootFolder(
     UserDrive dropbox, {
     String path = '',
     bool recursive = false,
@@ -149,40 +163,76 @@ class DropboxApi extends DriveBaseApi {
     if (limit != null) _data.addAll({"limit": limit});
     final _result = await _http.request<DropboxFiles>(_url,
         method: "POST", headers: _headers, data: _data);
-    final List<DriveFile> _files = [];
-    if (_result.success) {
-      final _d = _result.result.entries;
-      final _array = _d
-          .map((e) => DriveFile(
-                fileId: e.id,
-                name: e.name,
-                filePath: e.pathLower,
-                type: e.tag,
-                modifiedDate: e.serverModified,
-                size: e.size,
-                isDownloadable: e.isDownloadable,
-                fileExtension: e.tag != 'folder' ? _fileExtension(e.name) : '',
-              ))
-          .toList();
-      _files.addAll(_array);
-    }
-    return _files;
+    final DriveFilesResponse _response = DriveFilesResponse(files: []);
+    if (_result.success) _convrtFiles(_result, dropbox, null, _response);
+    return _response;
+  }
+
+  @override
+  Future<DriveFilesResponse> openFolder(
+      UserDrive dropbox, DriveFile folder) async {
+    _userDropbox = dropbox;
+    final String _url = '/2/files/list_folder';
+    final _headers = {
+      'Authorization': 'Bearer ${dropbox.accessToken}',
+      'Content-Type': 'application/json'
+    };
+    final _data = {
+      "path": folder.fileId,
+      //"limit": 20,
+    };
+    final _result = await _http.request<DropboxFiles>(_url,
+        method: "POST", headers: _headers, data: _data);
+
+    final DriveFilesResponse _response = DriveFilesResponse(files: []);
+    if (_result.success) _convrtFiles(_result, dropbox, folder, _response);
+    return _response;
   }
 
   ///Once a cursor has been retrieved from list_folder,
   ///use this to paginate through all files and retrieve updates to the folder,
   ///following the same rules as documented for list_folder.
-  Future<ResponseModel<dynamic>> listFolderContinue(
-      UserDrive dropbox, String cursor) async {
+
+  @override
+  Future<DriveFilesResponse> loadMoreFiles(
+      UserDrive dropbox, DriveFile folder) async {
     _userDropbox = dropbox;
     final String _url = '/2/files/list_folder/continue';
     final _headers = {
       'Authorization': 'Bearer ${dropbox.accessToken}',
       'Content-Type': 'application/json'
     };
-    final _data = {'cursor': cursor};
-    return await _http.request(_url,
+    final _data = {'cursor': folder.nextPageToken};
+    final _result = await _http.request<DropboxFiles>(_url,
         method: "POST", headers: _headers, data: _data);
+    final DriveFilesResponse _response = DriveFilesResponse(files: []);
+
+    if (_result.success) _convrtFiles(_result, dropbox, folder, _response);
+    return _response;
+  }
+
+  void _convrtFiles(ResponseModel<DropboxFiles> _result, UserDrive dropbox,
+      DriveFile folder, DriveFilesResponse _response) {
+    final List<DriveFile> _files = [];
+    final _d = _result.result.entries;
+    final _array = _d
+        .map((e) => DriveFile(
+            fileId: e.id,
+            name: e.name,
+            filePath: e.pathLower,
+            type: e.tag,
+            modifiedDate: e.serverModified ?? DateTime(1970, 7, 1),
+            size: e.size,
+            isDownloadable: e.isDownloadable ?? false,
+            fileExtension: e.tag != 'folder' ? _fileExtension(e.name) : '',
+            driveType: DriveTypeEnum.dropbox,
+            driveId: dropbox.id,
+            parentId: folder?.fileId))
+        .toList();
+    _files.addAll(_array);
+    _response.nextPageToken = _result.result.cursor;
+    _response.hasMore = _result.result.hasMore;
+    _response.files = _files;
   }
 
   ///A way to quickly get a cursor for the folder's state. Unlike list_folder,
@@ -235,6 +285,52 @@ class DropboxApi extends DriveBaseApi {
     final _data = {'path': path};
     return await _http.request(_url,
         method: "POST", headers: _headers, data: _data);
+  }
+
+  @override
+  Future<ResponseModel<DropBoxThumbnails>> getThumbnails(UserDrive dropbox,
+      {List<String> paths = const []}) async {
+    _userDropbox = dropbox;
+    final String _url =
+        'https://content.dropboxapi.com/2/files/get_thumbnail_batch';
+    final _headers = {
+      'Authorization': 'Bearer ${dropbox.accessToken}',
+      'Content-Type': 'application/json'
+    };
+    List _entries = paths
+        .map((e) =>
+            {"path": e, "format": "jpeg", "size": "w256h256", "mode": "strict"})
+        .toList();
+    final _data = {"entries": _entries};
+    return await _http.request<DropBoxThumbnails>(_url,
+        method: "POST", headers: _headers, data: _data);
+  }
+
+  @override
+  Future<Map<String, dynamic>> getFileMetadata(
+      UserDrive dropbox, String fileId) async {
+    _userDropbox = dropbox;
+    final String _url = '/2/files/get_metadata';
+    final _headers = {
+      'Authorization': 'Bearer ${dropbox.accessToken}',
+      'Content-Type': 'application/json'
+    };
+    final _data = {
+      "path": fileId,
+      "include_media_info": true,
+    };
+    final _result = await _http.request<Metadata>(_url,
+        method: "POST", headers: _headers, data: _data);
+    Map<String, dynamic> _metadata;
+    if (_result.success) {
+      final _d = _result.result.mediaInfo.metadata;
+      _metadata = {
+        "width": _d.dimensions.width,
+        "height": _d.dimensions.height,
+        "durationMillis": _d.duration.toString()
+      };
+    }
+    return _metadata;
   }
 
   _fileExtension(String path) {

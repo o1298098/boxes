@@ -1,1 +1,1 @@
-enum DriveType { googleDrive, dropbox, oneDrive }
+enum DriveTypeEnum { googleDrive, dropbox, oneDrive }

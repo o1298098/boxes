@@ -9,5 +9,10 @@ abstract class _HomeStore with Store {
   _HomeStore();
 
   @observable
-  User appUser;
+  UserDrive selectDrive;
+
+  @action
+  setDrive(UserDrive value) {
+    selectDrive = value;
+  }
 }

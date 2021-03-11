@@ -1,6 +1,10 @@
+export 'item.dart';
 export 'user.dart';
 export 'user_drive.dart';
 export 'drive_usage.dart';
 export 'drive_file.dart';
+export 'drive_files_response.dart';
 export 'google/google_files.dart';
 export 'dropbox/dropbox_files.dart';
+export 'dropbox/drop_box_thumbnails.dart';
+export 'dropbox/metadata.dart';

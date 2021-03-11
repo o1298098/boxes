@@ -10,6 +10,10 @@ class AppConfig {
 
   String get baseApiHost => _config['baseApiHost'];
 
+  String get graphQLHttpLink => _config['graphQLHttpLink'];
+
+  String get graphQlWebSocketLink => _config['graphQlWebSocketLink'];
+
   String get dropboxApiHost => _config['dropboxApiHost'];
 
   String get dropboxAppKey => _config['dropboxAppKey'];

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:boxes/models/enums/dirve_type_enum.dart';
 import 'package:boxes/models/google/google_files.dart';
 import 'package:boxes/models/models.dart';
 import 'package:boxes/models/response_model.dart';
@@ -22,9 +23,9 @@ class GoogleDriveApi extends DriveBaseApi {
 
   UserDrive _userGoogleDrive;
   SettingsStore store;
-  Future addGoogleDrive(String uid) async {
+  Future addGoogleDrive(String uid, String driveName) async {
     String _url =
-        'https://accounts.google.com/o/oauth2/v2/auth?scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive%20email%20profile&access_type=offline&response_type=code&prompt=consent&state=$uid&redirect_uri=https%3A%2F%2Fhome.fluttermovie.top%3A5001%2Fuser%2Fgoogle&client_id=$_clientId';
+        'https://accounts.google.com/o/oauth2/v2/auth?scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive%20email%20profile&access_type=offline&response_type=code&prompt=consent&state=$uid-$driveName&redirect_uri=https%3A%2F%2Fhome.fluttermovie.top%3A5001%2Fuser%2Fgoogle&client_id=$_clientId';
     if (await canLaunch(_url)) {
       await launch(_url, forceWebView: true);
     }
@@ -81,14 +82,15 @@ class GoogleDriveApi extends DriveBaseApi {
       final _json = _result.result['storageQuota'];
       _usage = DriveUsage(
           used: int.parse(_json['usage']),
-          allocated: int.parse(_json['limit']));
+          allocated: int.parse(_json['limit']),
+          lastUpdateTime: DateTime.now());
     }
     return _usage;
   }
 
   ///[corpora]--Groupings of files to which the query applies. Supported groupings are: 'user' (files created by, opened by, or shared directly with the user), 'drive' (files in the specified shared drive as indicated by the 'driveId'), 'domain' (files shared to the user's domain), and 'allDrives' (A combination of 'user' and 'drive' for all drives where the user is a member). When able, use 'user' or 'drive', instead of 'allDrives', for efficiency.
   @override
-  Future<List<DriveFile>> listFolder(UserDrive googleDrive,
+  Future<DriveFilesResponse> listRootFolder(UserDrive googleDrive,
       {String fields = '*',
       String driveId,
       String orderBy,
@@ -99,28 +101,94 @@ class GoogleDriveApi extends DriveBaseApi {
       'Authorization': 'Bearer ${googleDrive.accessToken}',
       'Content-Type': 'application/json'
     };
-    var _data = {'fields': fields};
+    var _data = {
+      'fields': fields,
+      'q': '"root" in parents and trashed = false',
+      'orderBy': 'folder,modifiedTime desc',
+    };
     var _result = await _http.request<GoogleFiles>(_url,
         headers: _headers, queryParameters: _data);
+    final DriveFilesResponse _response = DriveFilesResponse(files: []);
+    if (_result.success) _convertFiles(_result, googleDrive, null, _response);
+    return _response;
+  }
+
+  @override
+  Future<DriveFilesResponse> openFolder(UserDrive googleDrive, DriveFile folder,
+      {String fields = '*',
+      String driveId,
+      String orderBy,
+      String pageSize,
+      String corpora}) async {
+    String _url = '/files';
+    final _headers = {
+      'Authorization': 'Bearer ${googleDrive.accessToken}',
+      'Content-Type': 'application/json'
+    };
+    var _data = {
+      'fields': fields,
+      'orderBy': 'folder,modifiedTime desc',
+      'q': '"${folder.fileId}" in parents',
+    };
+    var _result = await _http.request<GoogleFiles>(_url,
+        headers: _headers, queryParameters: _data);
+    final DriveFilesResponse _response = DriveFilesResponse(files: []);
+    if (_result.success) _convertFiles(_result, googleDrive, folder, _response);
+    return _response;
+  }
+
+  @override
+  Future<DriveFilesResponse> loadMoreFiles(
+    UserDrive googleDrive,
+    DriveFile folder, {
+    String fields = '*',
+  }) async {
+    String _url = '/files';
+    final _headers = {
+      'Authorization': 'Bearer ${googleDrive.accessToken}',
+      'Content-Type': 'application/json'
+    };
+    var _data = {
+      'fields': fields,
+      'orderBy': 'folder,modifiedTime desc',
+      'pageToken': folder.nextPageToken,
+    };
+    if (folder != null)
+      _data.addAll({'q': '"${folder.fileId ?? 'root'}" in parents'});
+    var _result = await _http.request<GoogleFiles>(_url,
+        headers: _headers, queryParameters: _data);
+    final DriveFilesResponse _response = DriveFilesResponse(files: []);
+    if (_result.success) _convertFiles(_result, googleDrive, folder, _response);
+    return _response;
+  }
+
+  void _convertFiles(ResponseModel<GoogleFiles> _result, UserDrive googleDrive,
+      DriveFile folder, DriveFilesResponse _response) {
     final List<DriveFile> _files = [];
-    if (_result.success) {
-      final _d = _result.result.files;
-      final _array = _d
-          .map((e) => DriveFile(
-              fileId: e.id,
-              name: e.name,
-              type: e.mimeType == "application/vnd.google-apps.folder"
-                  ? 'folder'
-                  : 'file',
-              modifiedDate: DateTime.parse(e.modifiedTime),
-              size: e.size == null ? 0 : int.parse(e.size),
-              isDownloadable: true,
-              fileExtension: e.fileExtension ?? '',
-              mediaMetaData: e.imageMediaMetadata?.toJson(),
-              mimeType: e.mimeType))
-          .toList();
-      _files.addAll(_array);
-    }
-    return _files;
+    final _d = _result.result.files;
+    final _array = _d
+        .map((e) => DriveFile(
+            fileId: e.id,
+            name: e.name,
+            type: e.mimeType == "application/vnd.google-apps.folder"
+                ? 'folder'
+                : 'file',
+            modifiedDate: DateTime.parse(e.createdTime),
+            size: e.size == null ? 0 : int.parse(e.size),
+            isDownloadable: e.capabilities?.canDownload ?? false,
+            downloadLink: e.webContentLink,
+            fileExtension: e.fileExtension ?? '',
+            mediaMetaData: e.imageMediaMetadata?.toJson() ??
+                e.videoMediaMetadata?.toJson(),
+            thumbnailLink: e.thumbnailLink,
+            mimeType: e.mimeType,
+            driveType: DriveTypeEnum.googleDrive,
+            driveId: googleDrive.id,
+            parentId: folder?.fileId))
+        .toList();
+    _files.addAll(_array);
+    _response.nextPageToken = _result.result.nextPageToken;
+    _response.hasMore = _result.result.nextPageToken != null;
+    _response.files = _files;
   }
 }

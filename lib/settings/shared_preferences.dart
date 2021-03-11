@@ -10,13 +10,15 @@ class PreferencesService {
   final SharedPreferences _sharedPreferences;
 
   set appUser(User user) {
-    _sharedPreferences.setString(_appUser, user.toString());
+    if (user == null)
+      _sharedPreferences.remove(_appUser);
+    else
+      _sharedPreferences.setString(_appUser, user?.toString());
   }
 
   User get appUser {
-    //_sharedPreferences.clear();
-    final _userStr = _sharedPreferences.getString(_appUser) ?? '';
-    return _userStr.isNotEmpty ? User.fromJson(json.decode(_userStr)) : null;
+    final _userStr = _sharedPreferences.getString(_appUser) ?? null;
+    return _userStr != null ? User.fromJson(json.decode(_userStr)) : null;
   }
 
   set useDarkMode(bool useDarkMode) {

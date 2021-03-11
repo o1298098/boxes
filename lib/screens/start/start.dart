@@ -26,6 +26,7 @@ class _StartScreenState extends State<StartScreen> {
       () async => Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           pageBuilder: (_, __, ___) {
+            Navigator.of(context).maybePop(false);
             return MainScreen();
           },
         ),

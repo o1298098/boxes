@@ -7,5 +7,14 @@ abstract class DriveBaseApi {
 
   Future getSpaceUsage(UserDrive drive) async {}
 
-  Future listFolder(UserDrive dropbox) async {}
+  Future listRootFolder(UserDrive drive) async {}
+
+  Future openFolder(UserDrive drive, DriveFile folder) async {}
+
+  Future loadMoreFiles(UserDrive drive, DriveFile folder) async {}
+
+  Future getThumbnails(UserDrive drive,
+      {List<String> paths = const []}) async {}
+
+  Future getFileMetadata(UserDrive drive, String fileId) async {}
 }

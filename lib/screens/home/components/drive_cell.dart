@@ -1,13 +1,16 @@
 import 'package:boxes/models/models.dart';
+import 'package:boxes/settings/settings_store.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:boxes/utils/api/drive/drive_api_factory.dart';
 import 'package:boxes/utils/api/drive/drive_base_api.dart';
+import 'package:boxes/utils/calculation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class DriveCell extends StatefulWidget {
-  const DriveCell({this.drive, this.onTap});
+  const DriveCell({Key key, this.drive, this.onTap}) : super(key: key);
   final Function(UserDrive d) onTap;
 
   final UserDrive drive;
@@ -19,23 +22,39 @@ class DriveCell extends StatefulWidget {
 class _DriveCellState extends State<DriveCell> {
   UserDrive _drive;
   DriveUsage _usage;
+
+  SettingsStore _store;
   @override
   void initState() {
     _drive = widget.drive;
-    _usage = widget.drive.driveUsage;
+    _usage = widget.drive?.driveUsage;
+    _store = Provider.of<SettingsStore>(context, listen: false);
     _getSpaceUsage();
     super.initState();
   }
 
   _getSpaceUsage() async {
-    if (_usage != null) return;
-    final DriveBaseApi _api = DriveApiFactory.getInstance(_drive.driveType.id);
+    final _dateTime = DateTime.now();
+    final _lastUpdate =
+        _usage?.lastUpdateTime ?? DateTime.now().add(Duration(days: -1));
+    if (_dateTime.add(Duration(hours: -1)).isBefore(_lastUpdate)) return;
+    final DriveBaseApi _api =
+        DriveApiFactory.getInstance(_drive?.driveType?.id);
     final DriveUsage _result = await (_api.getSpaceUsage(_drive));
     if (_result != null) {
-      widget.drive.driveUsage = _result;
-      setState(() {
-        _usage = _result;
-      });
+      final _user = _store.appUser;
+      final _drive = _user.userDrives.firstWhere(
+          (e) => e.driveId == widget.drive.driveId,
+          orElse: () => null);
+      if (_drive != null) {
+        _drive.driveUsage = _result;
+        _store.setAppUser(value: _user);
+      }
+      if (this.mounted) {
+        setState(() {
+          _usage = _result;
+        });
+      }
     }
   }
 
@@ -55,20 +74,31 @@ class _DriveCellState extends State<DriveCell> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 35,
-              height: 35,
-              padding: EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: kBgDarkColor.withAlpha(150),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: SvgPicture.asset(
-                  'assets/images/${_drive.driveType.code}_logo.svg'),
+            Row(
+              children: [
+                Container(
+                  width: 35,
+                  height: 35,
+                  padding: EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: kBgDarkColor.withAlpha(150),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: SvgPicture.asset(
+                      'assets/images/${_drive?.driveType?.code}_logo.svg'),
+                ),
+                Spacer(),
+                GestureDetector(
+                  child: Icon(
+                    Icons.more_vert_rounded,
+                    color: kIconColor,
+                  ),
+                )
+              ],
             ),
             SizedBox(height: 10),
             Text(
-              _drive.driveType.name,
+              _drive?.driveType?.name ?? '',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w500,
@@ -77,8 +107,8 @@ class _DriveCellState extends State<DriveCell> {
             ),
             Spacer(),
             _DataBar(
-              used: ((_usage?.used ?? 0) / 1024 / 1024 / 1024).toDouble(),
-              total: ((_usage?.allocated ?? 1) / 1024 / 1024 / 1024).toDouble(),
+              used: _usage?.used ?? 0,
+              total: _usage?.allocated ?? 1,
             )
           ],
         ),
@@ -88,26 +118,26 @@ class _DriveCellState extends State<DriveCell> {
 }
 
 class _DataBar extends StatelessWidget {
-  final double used;
-  final double total;
-  const _DataBar({this.total = 15.0, this.used = 4.5});
+  final int used;
+  final int total;
+  const _DataBar({this.total = 15, this.used = 4});
   @override
   Widget build(BuildContext context) {
     final _fontSize = 8.0;
     final _barHeight = 4.0;
     final _radius = _barHeight / 2;
-    final _p = used / total;
+    final _p = (used / total).toDouble();
     return Column(
       children: [
         Row(
           children: [
             Text(
-              '${used.toStringAsFixed(2)} GB',
+              '${Calcuation.filesize(used)}',
               style: TextStyle(fontSize: _fontSize, color: Color(0xFF717171)),
             ),
             Spacer(),
             Text(
-              '${total.toStringAsFixed(0)} GB',
+              '${Calcuation.filesize(total)}',
               style: TextStyle(fontSize: _fontSize, color: Colors.white),
             )
           ],

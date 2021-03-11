@@ -6,6 +6,7 @@ import 'drive_type.dart';
 
 class UserDrive {
   final int id;
+  final String name;
   String accessToken;
   final String scope;
   final String refreshToken;
@@ -15,10 +16,10 @@ class UserDrive {
   final String updateTime;
   final DriveType driveType;
   DriveUsage driveUsage;
-  List<DriveFile> files;
 
   UserDrive({
     this.id,
+    this.name,
     this.accessToken,
     this.scope,
     this.refreshToken,
@@ -28,17 +29,17 @@ class UserDrive {
     this.updateTime,
     this.driveType,
     this.driveUsage,
-    this.files,
   });
 
   @override
   String toString() {
-    return '{"id": $id, "accessToken": "${accessToken ?? ''}", "scope": "${scope ?? ''}", "refreshToken": "${refreshToken ?? ''}", "tokenType": "${tokenType ?? ''}", "driveId": "${driveId ?? ''}", "expiresIn": "${expiresIn ?? ''}", "updateTime": "${updateTime ?? ''}", "driveTypeNavigation":$driveType}';
+    return '{"id": $id, "name": "${name ?? ''}", "accessToken": "${accessToken ?? ''}", "scope": "${scope ?? ''}", "refreshToken": "${refreshToken ?? ''}", "tokenType": "${tokenType ?? ''}", "driveId": "${driveId ?? ''}", "expiresIn": "${expiresIn ?? ''}", "updateTime": "${updateTime ?? ''}", "driveTypeNavigation":$driveType,"driveUsage":$driveUsage}';
   }
 
   factory UserDrive.fromJson(Map<String, dynamic> json) {
     return UserDrive(
       id: json['id'] as int,
+      name: json['name'] as String,
       accessToken: json['accessToken'] as String,
       scope: json['scope'] as String,
       refreshToken: json['refreshToken'] as String,
@@ -50,12 +51,16 @@ class UserDrive {
           ? null
           : DriveType.fromJson(
               json['driveTypeNavigation'] as Map<String, dynamic>),
+      driveUsage: json['driveUsage'] == null
+          ? null
+          : DriveUsage.fromJson(json['driveUsage'] as Map<String, dynamic>),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'name': name,
       'accessToken': accessToken,
       'scope': scope,
       'refreshToken': refreshToken,
@@ -69,6 +74,7 @@ class UserDrive {
 
   UserDrive copyWith({
     int id,
+    String name,
     String accessToken,
     String scope,
     String refreshToken,
@@ -80,6 +86,7 @@ class UserDrive {
   }) {
     return UserDrive(
       id: id ?? this.id,
+      name: name ?? this.name,
       accessToken: accessToken ?? this.accessToken,
       scope: scope ?? this.scope,
       refreshToken: refreshToken ?? this.refreshToken,
@@ -95,6 +102,7 @@ class UserDrive {
   bool operator ==(Object o) =>
       o is UserDrive &&
       identical(o.id, id) &&
+      identical(o.name, name) &&
       identical(o.accessToken, accessToken) &&
       identical(o.scope, scope) &&
       identical(o.refreshToken, refreshToken) &&
@@ -108,6 +116,7 @@ class UserDrive {
   int get hashCode {
     return hashValues(
       id,
+      name,
       accessToken,
       scope,
       refreshToken,
