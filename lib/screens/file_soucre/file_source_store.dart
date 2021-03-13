@@ -14,7 +14,6 @@ abstract class _FileSourceStore with Store {
   @observable
   bool selected = false;
 
-  @observable
   bool get isEdit => selectDrive != null;
 
   @action

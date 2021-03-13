@@ -55,6 +55,8 @@ class DriveFile {
     return _videoDuration;
   }
 
+  get isEmptyData => this.modifiedDate == DateTime(1970, 07, 01);
+
   Map<String, dynamic> toJson() {
     return {
       'driveId': driveId,

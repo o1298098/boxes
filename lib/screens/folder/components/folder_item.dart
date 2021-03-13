@@ -5,9 +5,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class FolderItem extends StatelessWidget {
   final DriveFile file;
+  final int count;
   final Function(DriveFile) onTap;
   final String token;
-  const FolderItem({@required this.file, this.token, @required this.onTap});
+  const FolderItem(
+      {@required this.file, this.token, @required this.onTap, this.count});
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -36,7 +38,7 @@ class FolderItem extends StatelessWidget {
             ),
             SizedBox(height: 6),
             Text(
-              '- files',
+              '${count ?? '-'} files',
               style: TextStyle(
                 fontSize: 10,
                 color: kGrayColor,

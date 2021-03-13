@@ -17,4 +17,6 @@ abstract class DriveBaseApi {
       {List<String> paths = const []}) async {}
 
   Future getFileMetadata(UserDrive drive, String fileId) async {}
+
+  Future getTemporaryLink(UserDrive drive, String fileId) async {}
 }

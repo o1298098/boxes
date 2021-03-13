@@ -273,16 +273,16 @@ class DropboxApi extends DriveBaseApi {
   ///This link will expire in four hours and afterwards you will get 410 Gone.
   ///This URL should not be used to display content directly in the browser.
   ///The Content-Type of the link is determined automatically by the file's mime type.
-
+  @override
   Future<ResponseModel<dynamic>> getTemporaryLink(
-      UserDrive dropbox, String path) async {
+      UserDrive dropbox, String fileId) async {
     _userDropbox = dropbox;
     final String _url = '/2/files/get_temporary_link';
     final _headers = {
       'Authorization': 'Bearer ${dropbox.accessToken}',
       'Content-Type': 'application/json'
     };
-    final _data = {'path': path};
+    final _data = {'path': fileId};
     return await _http.request(_url,
         method: "POST", headers: _headers, data: _data);
   }

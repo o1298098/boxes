@@ -6,49 +6,24 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class FolderPath extends StatelessWidget {
   const FolderPath({
     @required this.pathItem,
-    @required this.onTap,
+    @required this.onPathTap,
+    this.onSwitchTap,
+    this.isList = false,
   });
   final List<Item> pathItem;
-  final Function(Item) onTap;
+  final Function(Item) onPathTap;
+  final Function onSwitchTap;
+  final bool isList;
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Row(
         children: [
-          PathButton(),
-          SizedBox(
-            height: 36,
-            child: ListView.separated(
-              padding: EdgeInsets.symmetric(
-                horizontal: kDefaultPadding,
-                vertical: 8,
-              ),
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              itemBuilder: (_, index) {
-                final _d = pathItem[index];
-                final _selected = index == pathItem.length - 1;
-                return InkWell(
-                  onTap: () => onTap(_d),
-                  child: Text(
-                    _d.name,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: _selected ? Color(0xFFFFFFFF) : kGrayColor,
-                    ),
-                  ),
-                );
-              },
-              separatorBuilder: (_, index) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: const Icon(
-                  FontAwesomeIcons.chevronRight,
-                  color: kGrayColor,
-                  size: 10,
-                ),
-              ),
-              itemCount: pathItem.length,
-            ),
+          _PathButton(),
+          _FolderPath(pathItem: pathItem, onTap: onPathTap),
+          _LayoutSwitch(
+            isList: isList,
+            onTap: onSwitchTap,
           ),
         ],
       ),
@@ -56,8 +31,129 @@ class FolderPath extends StatelessWidget {
   }
 }
 
-class PathButton extends StatelessWidget {
-  const PathButton({
+class _LayoutSwitch extends StatelessWidget {
+  const _LayoutSwitch({
+    Key key,
+    this.isList = false,
+    this.onTap,
+  }) : super(key: key);
+
+  final bool isList;
+  final Function onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(3.0),
+      decoration: BoxDecoration(
+        color: kBgLightColor,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Row(
+        children: [
+          _LayoutItem(
+            onTap: onTap,
+            selected: isList,
+            icon: Icons.view_list_rounded,
+          ),
+          _LayoutItem(
+            onTap: onTap,
+            selected: !isList,
+            icon: Icons.view_module_rounded,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LayoutItem extends StatelessWidget {
+  const _LayoutItem({
+    Key key,
+    @required this.onTap,
+    this.icon,
+    this.selected = false,
+  }) : super(key: key);
+
+  final Function onTap;
+  final IconData icon;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        decoration: selected
+            ? BoxDecoration(
+                color: kLineColor,
+                borderRadius: BorderRadius.circular(6.0),
+              )
+            : null,
+        padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
+        child: Icon(
+          icon,
+          color: selected ? Color(0xFFFFFFFF) : kIconColor,
+          size: 14,
+        ),
+      ),
+    );
+  }
+}
+
+class _FolderPath extends StatelessWidget {
+  const _FolderPath({
+    Key key,
+    @required this.pathItem,
+    @required this.onTap,
+  }) : super(key: key);
+
+  final List<Item> pathItem;
+  final Function(Item p1) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: SizedBox(
+        height: 36,
+        child: ListView.separated(
+          padding: EdgeInsets.symmetric(
+            horizontal: kDefaultPadding,
+            vertical: 8,
+          ),
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          itemBuilder: (_, index) {
+            final _d = pathItem[index];
+            final _selected = index == pathItem.length - 1;
+            return InkWell(
+              onTap: () => onTap(_d),
+              child: Text(
+                _d.name,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: _selected ? Color(0xFFFFFFFF) : kGrayColor,
+                ),
+              ),
+            );
+          },
+          separatorBuilder: (_, index) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: const Icon(
+              FontAwesomeIcons.chevronRight,
+              color: kGrayColor,
+              size: 10,
+            ),
+          ),
+          itemCount: pathItem.length,
+        ),
+      ),
+    );
+  }
+}
+
+class _PathButton extends StatelessWidget {
+  const _PathButton({
     Key key,
   }) : super(key: key);
 

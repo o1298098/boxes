@@ -11,8 +11,10 @@ class SideMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _userHeight = MediaQuery.of(context).size.height - 520 > 0
-        ? MediaQuery.of(context).size.height - 520
+    final _mediaQuery = MediaQuery.of(context);
+    final _menuHeight = 540 + _mediaQuery.padding.top;
+    final _userHeight = _mediaQuery.size.height - _menuHeight > 0
+        ? _mediaQuery.size.height - _menuHeight
         : 0.0;
     /*final List _menuItems = [
     {'name': 'HOME', 'icon': Icons.home_outlined},
@@ -23,11 +25,13 @@ class SideMenu extends StatelessWidget {
     {'name': 'SETTINGS', 'icon': Icons.settings_outlined},
   ];*/
     return Container(
-      width: 65,
+      width: 65 + _mediaQuery.padding.left,
       color: kMenuBackgroundColor,
       child: SafeArea(
         top: true,
         bottom: false,
+        right: false,
+        left: false,
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: kDefaultPadding),
           child: SingleChildScrollView(

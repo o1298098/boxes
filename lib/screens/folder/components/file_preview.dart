@@ -5,13 +5,15 @@ import 'package:boxes/utils/calculation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:video_player/video_player.dart';
 
 import 'file_preview_item.dart';
 
 class FilePreview extends StatelessWidget {
   final FolderStore store;
+  final Function onClose;
 
-  const FilePreview({Key key, this.store}) : super(key: key);
+  const FilePreview({Key key, this.store, this.onClose}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -42,10 +44,20 @@ class FilePreview extends StatelessWidget {
                                   color: Color(0xFFFFFFFF),
                                   fontSize: 12,
                                 ),
+                              ),
+                              Spacer(),
+                              InkWell(
+                                onTap: onClose,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Icon(
+                                    Icons.close,
+                                    size: 16,
+                                  ),
+                                ),
                               )
                             ],
                           ),
-                          SizedBox(height: kDefaultPadding * .8),
                           Divider(
                             color: kLineColor,
                             thickness: 1.5,
@@ -53,10 +65,16 @@ class FilePreview extends StatelessWidget {
                           SizedBox(height: kDefaultPadding * .8),
                           Container(
                             width: 260,
-                            //constraints: BoxConstraints(maxHeight: 300),
-                            child: FilePreviewItem(
-                              file: store.selectedFile,
-                              token: store.drive.accessToken,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                FilePreviewItem(
+                                  file: store.selectedFile,
+                                  token: store.drive.accessToken,
+                                  fill: false,
+                                ),
+                                _VideoPlayer(store: store)
+                              ],
                             ),
                           ),
                           SizedBox(height: kDefaultPadding * .8),
@@ -93,5 +111,42 @@ class FilePreview extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _VideoPlayer extends StatelessWidget {
+  final FolderStore store;
+
+  const _VideoPlayer({Key key, this.store}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    _onTap() async {
+      await Navigator.of(context, rootNavigator: false).push(
+        PageRouteBuilder(
+          opaque: false,
+          barrierColor: Colors.transparent,
+          pageBuilder: (_, animation, __) {
+            return LayoutBuilder(
+              builder: (_, c) {
+                return Scaffold(
+                  appBar: AppBar(),
+                  body: AppVideoPlayer(
+                    controller: VideoPlayerController.network(
+                        store.selectedFile.downloadLink),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      );
+    }
+
+    return store.selectedFile.downloadLink != null && store.selectedFile.isVideo
+        ? PlayArrow(
+            onTap: () async => _onTap(),
+          )
+        : SizedBox();
   }
 }

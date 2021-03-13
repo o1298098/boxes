@@ -7,7 +7,11 @@ import 'package:flutter/material.dart';
 class FilePreviewItem extends StatelessWidget {
   final DriveFile file;
   final String token;
-  const FilePreviewItem({Key key, this.file, this.token}) : super(key: key);
+  final bool fill;
+  final double iconSize;
+  const FilePreviewItem(
+      {Key key, this.file, this.token, this.fill = true, this.iconSize = 65.0})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -16,20 +20,20 @@ class FilePreviewItem extends StatelessWidget {
             ? (file.driveType == DriveTypeEnum.dropbox
                 ? Image.memory(
                     file.dropboxThumbnail,
-                    fit: BoxFit.fitWidth,
+                    fit: BoxFit.cover,
                     width: c.maxWidth,
-                    //height: c.maxHeight,
+                    height: fill ? c.maxHeight : null,
                     alignment: Alignment.topCenter,
                     gaplessPlayback: true,
                   )
                 : CachedNetworkImage(
                     imageUrl: file.thumbnailLink,
                     width: c.maxWidth,
-                    //height: c.maxHeight,
+                    height: fill ? c.maxHeight : null,
                     httpHeaders: {
                       "Authorization": "Bearer $token",
                     },
-                    fit: BoxFit.fitWidth,
+                    fit: BoxFit.cover,
                     alignment: Alignment.topCenter,
                     cacheKey: file.fileId,
                   ))
@@ -38,6 +42,7 @@ class FilePreviewItem extends StatelessWidget {
                 child: Center(
                   child: FileTypeIcon(
                     type: file.fileExtension,
+                    size: iconSize,
                   ),
                 ),
               );

@@ -99,6 +99,21 @@ mixin _$FolderStore on _FolderStore, Store {
     });
   }
 
+  final _$displayAsListAtom = Atom(name: '_FolderStore.displayAsList');
+
+  @override
+  bool get displayAsList {
+    _$displayAsListAtom.reportRead();
+    return super.displayAsList;
+  }
+
+  @override
+  set displayAsList(bool value) {
+    _$displayAsListAtom.reportWrite(value, super.displayAsList, () {
+      super.displayAsList = value;
+    });
+  }
+
   final _$pathChangedAsyncAction = AsyncAction('_FolderStore.pathChanged');
 
   @override
@@ -134,6 +149,30 @@ mixin _$FolderStore on _FolderStore, Store {
     return _$_getThumbnailAsyncAction.run(() => super._getThumbnail(f));
   }
 
+  final _$_FolderStoreActionController = ActionController(name: '_FolderStore');
+
+  @override
+  int fileCount(String folderId) {
+    final _$actionInfo = _$_FolderStoreActionController.startAction(
+        name: '_FolderStore.fileCount');
+    try {
+      return super.fileCount(folderId);
+    } finally {
+      _$_FolderStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void layoutChange() {
+    final _$actionInfo = _$_FolderStoreActionController.startAction(
+        name: '_FolderStore.layoutChange');
+    try {
+      return super.layoutChange();
+    } finally {
+      _$_FolderStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
   @override
   String toString() {
     return '''
@@ -142,7 +181,8 @@ loading: ${loading},
 drive: ${drive},
 folders: ${folders},
 files: ${files},
-selectedFile: ${selectedFile}
+selectedFile: ${selectedFile},
+displayAsList: ${displayAsList}
     ''';
   }
 }

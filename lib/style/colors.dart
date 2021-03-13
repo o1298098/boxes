@@ -12,5 +12,4 @@ const kMenuBackgroundColor = Color(0xFF26262E);
 const kSelectIconColor = Color(0xFFE0E0E0);
 const kIconColor = Color(0xFF86868A);
 const kLineColor = Color(0xFF34343B);
-
 const kDefaultPadding = 20.0;

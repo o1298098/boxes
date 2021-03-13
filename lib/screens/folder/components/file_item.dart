@@ -1,9 +1,6 @@
-import 'package:boxes/components/file_type_icon.dart';
 import 'package:boxes/models/drive_file.dart';
-import 'package:boxes/models/enums/dirve_type_enum.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:boxes/utils/calculation.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -23,6 +20,7 @@ class FileItem extends StatefulWidget {
 
 class _FileItemState extends State<FileItem> {
   DriveFile _file;
+
   @override
   void initState() {
     _file = widget.file;

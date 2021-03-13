@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:boxes/models/models.dart';
 import 'package:boxes/models/response_model.dart';
 import 'package:boxes/utils/api/drive/drive_api_factory.dart';
@@ -46,6 +44,11 @@ abstract class _FolderStore with Store {
 
   @observable
   DriveFile selectedFile;
+
+  @observable
+  bool displayAsList = false;
+
+  Function previewShow = () {};
 
   _init() async {
     if (drive == null) return;
@@ -166,14 +169,27 @@ abstract class _FolderStore with Store {
 
   @action
   Future fileTap(DriveFile file) async {
+    previewShow();
     if (selectedFile == file) return;
     selectedFile = file;
     if (selectedFile.isVideo && selectedFile.mediaMetaData == null) {
       final _result = await _api.getFileMetadata(drive, selectedFile.fileId);
       if (_result is Map) {
+        if (file.fileId != selectedFile.fileId) return;
         file.mediaMetaData = _result;
         selectedFile = file;
         await _db.insertFile(selectedFile);
+      }
+    }
+    if (selectedFile.isVideo && selectedFile.downloadLink == null) {
+      final _api =
+          DriveApiFactory.getInstance(selectedFile.driveType.index + 1);
+      final ResponseModel _result =
+          await _api.getTemporaryLink(drive, selectedFile.fileId);
+      if (_result.success) {
+        if (file.fileId != selectedFile.fileId) return;
+        file.downloadLink = _result.result["link"];
+        selectedFile = file;
       }
     }
   }
@@ -240,20 +256,30 @@ abstract class _FolderStore with Store {
     }
   }
 
+  @action
+  int fileCount(String folderId) {
+    return _fileIndex.where((e) => e.parentId == folderId).toList().length;
+  }
+
+  @action
+  void layoutChange() {
+    displayAsList = !displayAsList;
+  }
+
   void _updatePath({Item folder}) {
     if (folder == null) {
       path.clear();
-      path.add(Item(name: 'Home'));
+      path = path..add(Item(name: 'Home'));
       return;
     }
     Item _r =
         path.firstWhere((e) => e.value == folder?.value, orElse: () => null);
     if (_r != null) {
       int _index = path.indexOf(_r);
-      path.removeRange(_index + 1, path.length);
+      path = path..removeRange(_index + 1, path.length);
       return;
     } else
-      path.add(Item(name: folder.name, value: folder.value));
+      path = path..add(Item(name: folder.name, value: folder.value));
   }
 
   bool _shouldAutoRefresh(DriveFile folder) {

@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Boxes',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(),
+        theme: ThemeData.light(),
         darkTheme: ThemeData.dark(),
         onGenerateRoute: (RouteSettings settings) {
           //print('build route for ${settings.name}');
