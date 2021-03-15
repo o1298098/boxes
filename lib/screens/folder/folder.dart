@@ -179,7 +179,11 @@ class _Folder extends StatelessWidget {
                   ? [
                       SliverToBoxAdapter(
                           child: SizedBox(height: kDefaultPadding)),
-                      FileList(store: store, drive: store.drive)
+                      FileList(
+                        store: store,
+                        drive: store.drive,
+                        list: store.foldersAndFiles,
+                      )
                     ]
                   : _buildGrid()),
             ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:mobx/mobx.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'file_preview_item.dart';
@@ -12,32 +13,31 @@ import 'file_preview_item.dart';
 class FileList extends StatelessWidget {
   final FolderStore store;
   final UserDrive drive;
+  final ObservableList<DriveFile> list;
 
-  const FileList({Key key, this.store, this.drive}) : super(key: key);
+  const FileList({Key key, this.store, this.drive, @required this.list})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final List<DriveFile> _lists = []
-      ..addAll(store.folders)
-      ..addAll(store.files);
     return Observer(
       builder: (_) => store.loading
           ? _FileListShimmer()
           : SliverList(
               delegate: SliverChildBuilderDelegate(
                 (_, index) {
-                  final _d = _lists[index];
+                  final _d = list[index];
                   final _isFolder = _d.type == 'folder';
                   return _FileListItem(
                     file: _d,
                     store: store,
                     isFolder: _isFolder,
                     token: drive.accessToken,
-                    onTap: () async => _isFolder
-                        ? await store.loadFolder(_d)
-                        : await store.fileTap(_d),
+                    onTap: (file) async => _isFolder
+                        ? await store.loadFolder(file)
+                        : await store.fileTap(file),
                   );
                 },
-                childCount: _lists.length,
+                childCount: list.length,
               ),
             ),
     );
@@ -46,7 +46,7 @@ class FileList extends StatelessWidget {
 
 class _FileListItem extends StatelessWidget {
   final bool isFolder;
-  final Function onTap;
+  final Function(DriveFile) onTap;
   final DriveFile file;
   final FolderStore store;
   final String token;
@@ -57,59 +57,61 @@ class _FileListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8.0),
-        padding: const EdgeInsets.all(kDefaultPadding * .8),
-        decoration: BoxDecoration(
-          color: store.selectedFile == file ? kLineColor : kBgLightColor,
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: Row(
-          children: [
-            isFolder
-                ? Icon(
-                    FontAwesomeIcons.solidFolder,
-                    color: kGrayColor,
-                  )
-                : SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: FilePreviewItem(
-                      file: file,
-                      iconSize: 20,
-                      token: token,
-                    )),
-            SizedBox(width: kDefaultPadding * .8),
-            Container(
-              constraints: BoxConstraints(maxWidth: 500),
-              child: Text(
-                file.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+      onTap: () async => await onTap(file),
+      child: Observer(
+        builder: (_) => Container(
+          margin: const EdgeInsets.only(bottom: 8.0),
+          padding: const EdgeInsets.all(kDefaultPadding * .8),
+          decoration: BoxDecoration(
+            color: store.selectedFile == file ? kLineColor : kBgLightColor,
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Row(
+            children: [
+              isFolder
+                  ? Icon(
+                      FontAwesomeIcons.solidFolder,
+                      color: kGrayColor,
+                    )
+                  : SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: FilePreviewItem(
+                        file: file,
+                        iconSize: 20,
+                        token: token,
+                      )),
+              SizedBox(width: kDefaultPadding * .8),
+              Container(
+                constraints: BoxConstraints(maxWidth: 500),
+                child: Text(
+                  file.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: kIconColor, fontSize: 12),
+                ),
+              ),
+              Spacer(),
+              Text(
+                isFolder
+                    ? '${store.fileCount(file.fileId)} files'
+                    : DateFormat.yMMMd().format(file.modifiedDate).toString(),
                 style: TextStyle(color: kIconColor, fontSize: 12),
               ),
-            ),
-            Spacer(),
-            Text(
-              isFolder
-                  ? '${store.fileCount(file.fileId)} files'
-                  : DateFormat.yMMMd().format(file.modifiedDate).toString(),
-              style: TextStyle(color: kIconColor, fontSize: 12),
-            ),
-            SizedBox(width: kDefaultPadding),
-            Icon(
-              FontAwesomeIcons.star,
-              color: kIconColor,
-              size: 14,
-            ),
-            SizedBox(width: kDefaultPadding * .5),
-            Icon(
-              Icons.more_vert_rounded,
-              color: kIconColor,
-              size: 18,
-            ),
-          ],
+              SizedBox(width: kDefaultPadding),
+              Icon(
+                FontAwesomeIcons.star,
+                color: kIconColor,
+                size: 14,
+              ),
+              SizedBox(width: kDefaultPadding * .5),
+              Icon(
+                Icons.more_vert_rounded,
+                color: kIconColor,
+                size: 18,
+              ),
+            ],
+          ),
         ),
       ),
     );

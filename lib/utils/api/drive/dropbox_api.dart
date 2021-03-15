@@ -150,7 +150,6 @@ class DropboxApi extends DriveBaseApi {
     final String _url = '/2/files/list_folder';
     final _headers = {
       'Authorization': 'Bearer ${dropbox.accessToken}',
-      'Content-Type': 'application/json'
     };
     final _data = {
       "path": "",
@@ -280,7 +279,6 @@ class DropboxApi extends DriveBaseApi {
     final String _url = '/2/files/get_temporary_link';
     final _headers = {
       'Authorization': 'Bearer ${dropbox.accessToken}',
-      'Content-Type': 'application/json'
     };
     final _data = {'path': fileId};
     return await _http.request(_url,
@@ -295,7 +293,6 @@ class DropboxApi extends DriveBaseApi {
         'https://content.dropboxapi.com/2/files/get_thumbnail_batch';
     final _headers = {
       'Authorization': 'Bearer ${dropbox.accessToken}',
-      'Content-Type': 'application/json'
     };
     List _entries = paths
         .map((e) =>
@@ -313,7 +310,6 @@ class DropboxApi extends DriveBaseApi {
     final String _url = '/2/files/get_metadata';
     final _headers = {
       'Authorization': 'Bearer ${dropbox.accessToken}',
-      'Content-Type': 'application/json'
     };
     final _data = {
       "path": fileId,

@@ -53,6 +53,7 @@ class FilePreview extends StatelessWidget {
                                   child: Icon(
                                     Icons.close,
                                     size: 16,
+                                    color: Color(0xFFFFFFFF),
                                   ),
                                 ),
                               )

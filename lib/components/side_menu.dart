@@ -12,7 +12,7 @@ class SideMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _mediaQuery = MediaQuery.of(context);
-    final _menuHeight = 540 + _mediaQuery.padding.top;
+    final _menuHeight = 530 + _mediaQuery.padding.top;
     final _userHeight = _mediaQuery.size.height - _menuHeight > 0
         ? _mediaQuery.size.height - _menuHeight
         : 0.0;

@@ -3,6 +3,7 @@ import 'package:boxes/models/response_model.dart';
 import 'package:boxes/utils/api/drive/drive_api_factory.dart';
 import 'package:boxes/utils/api/drive/drive_base_api.dart';
 import 'package:boxes/utils/database_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
 
 part 'folder_store.g.dart';
@@ -48,6 +49,9 @@ abstract class _FolderStore with Store {
   @observable
   bool displayAsList = false;
 
+  ObservableList<DriveFile> get foldersAndFiles =>
+      ObservableList()..addAll(folders)..addAll(files);
+
   Function previewShow = () {};
 
   _init() async {
@@ -74,9 +78,11 @@ abstract class _FolderStore with Store {
     _updatePath(
         folder: _isRoot ? null : Item(name: folder.name, value: folder.fileId));
     if (!_fileExists(folder)) {
-      final _dbFiles = _isRoot
-          ? await _db.getRootFiles(drive.id)
-          : await _db.getFolderFiles(drive.id, folder.fileId);
+      List<DriveFile> _dbFiles = [];
+      if (!kIsWeb)
+        _dbFiles = _isRoot
+            ? await _db.getRootFiles(drive.id)
+            : await _db.getFolderFiles(drive.id, folder.fileId);
       _setCurrectFolder(_dbFiles, folderId: folder?.fileId);
     } else
       _getFileFromIndex(folder?.fileId);

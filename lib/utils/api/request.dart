@@ -38,12 +38,7 @@ class Request {
         );
         _dio.interceptors.add(_manager.interceptor);
       }*/
-      _dio.options.headers = {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
-        "Access-Control-Allow-Methods": "GET,POST,OPTIONS,HEAD",
-        "Access-Control-Allow-Credentials": "true"
-      };
+      _dio.options.headers = {};
       if (headers != null) _dio.options.headers.addAll(headers);
       _dio.options.method = method;
       final response = await _dio.request(
@@ -70,12 +65,7 @@ class Request {
       Map<String, Object> headers,
       List<Interceptor> interceptors}) async {
     try {
-      _tokenDio.options.headers = {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
-        "Access-Control-Allow-Methods": "GET,POST,OPTIONS,HEAD",
-        "Access-Control-Allow-Credentials": "true"
-      };
+      _tokenDio.options.headers = {};
       if (headers != null) _tokenDio.options.headers.addAll(headers);
       _tokenDio.options.method = method;
       final response = await _tokenDio.request(
