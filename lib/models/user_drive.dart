@@ -49,11 +49,10 @@ class UserDrive {
       updateTime: json['updateTime'] as String,
       driveType: json['driveTypeNavigation'] == null
           ? null
-          : DriveType.fromJson(
-              json['driveTypeNavigation'] as Map<String, dynamic>),
+          : DriveType.fromJson(json['driveTypeNavigation']),
       driveUsage: json['driveUsage'] == null
           ? null
-          : DriveUsage.fromJson(json['driveUsage'] as Map<String, dynamic>),
+          : DriveUsage.fromJson(json['driveUsage']),
     );
   }
 
@@ -68,7 +67,8 @@ class UserDrive {
       'driveId': driveId,
       'expiresIn': expiresIn,
       'updateTime': updateTime,
-      'driveTypeNavigation': driveType?.toJson(),
+      'driveTypeNavigation': driveType?.toString(),
+      'driveUsage': driveUsage?.toString(),
     };
   }
 

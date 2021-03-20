@@ -1,13 +1,19 @@
 import 'package:boxes/components/custom_app_bar.dart';
+import 'package:boxes/models/enums/upload_status.dart';
+import 'package:boxes/models/file_upload.dart';
 import 'package:boxes/models/models.dart';
 import 'package:boxes/screens/folder/components/file_preview.dart';
 import 'package:boxes/screens/folder/components/folder_path.dart';
 import 'package:boxes/screens/folder/folder_store.dart';
 import 'package:boxes/screens/home/components/sliverappbar_delegate.dart';
+import 'package:boxes/services/upload_service.dart';
 import 'package:boxes/style/colors.dart';
+import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 import 'components/file_grid.dart';
 import 'components/file_list.dart';
@@ -27,11 +33,13 @@ class _FolderScreenState extends State<FolderScreen>
   ScrollController _controller;
   FolderStore _store;
   AnimationController _previewController;
+  UploadService _uploadService;
+
   @override
   void initState() {
     _previewController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 200));
-
+    _uploadService = Provider.of<UploadService>(context, listen: false);
     _store = FolderStore(widget.drive)..previewShow = _showPreview;
     _controller = ScrollController()
       ..addListener(() {
@@ -57,6 +65,22 @@ class _FolderScreenState extends State<FolderScreen>
     _previewController.reverse();
   }
 
+  _onAdd() async {
+    final _files = await FilePickerCross.importFromStorage();
+    final _file = _files.toUint8List().buffer;
+    FileUpload _fileUpload = FileUpload(
+        uploadId: Uuid().v1(),
+        driveId: widget.drive.id,
+        name: _files.fileName,
+        filePath: _files.path,
+        uploadDate: DateTime.now(),
+        fileSize: _files.length,
+        stepIndex: 0,
+        status: UploadStatus.waiting,
+        data: _file);
+    _uploadService.uploadFile(widget.drive, _fileUpload);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -70,6 +94,7 @@ class _FolderScreenState extends State<FolderScreen>
                 drive: widget.drive,
                 onPop: widget.onPop,
                 store: _store,
+                onAdd: () async => await _onAdd(),
               ),
             ),
             AnimatedBuilder(
@@ -108,8 +133,15 @@ class _Folder extends StatelessWidget {
   final UserDrive drive;
   final Function onPop;
   final FolderStore store;
+  final Function onAdd;
 
-  const _Folder({Key key, this.controller, this.drive, this.onPop, this.store})
+  const _Folder(
+      {Key key,
+      this.controller,
+      this.drive,
+      this.onPop,
+      this.store,
+      this.onAdd})
       : super(key: key);
 
   @override
@@ -150,10 +182,13 @@ class _Folder extends StatelessWidget {
                       needBackButton: true,
                       backButtonTap: onPop,
                       actions: [
-                        Icon(
-                          CupertinoIcons.add_circled,
-                          color: kIconColor,
-                          size: 18,
+                        InkWell(
+                          onTap: onAdd,
+                          child: Icon(
+                            CupertinoIcons.add_circled,
+                            color: kIconColor,
+                            size: 18,
+                          ),
                         ),
                         SizedBox(width: kDefaultPadding),
                         Icon(

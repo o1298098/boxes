@@ -5,7 +5,8 @@ import 'package:boxes/models/models.dart';
 import 'package:boxes/responsive.dart';
 import 'package:boxes/screens/file_soucre/file_source_store.dart';
 import 'package:boxes/screens/home/components/sliverappbar_delegate.dart';
-import 'package:boxes/settings/settings_store.dart';
+import 'package:boxes/services/database_service.dart';
+import 'package:boxes/services/settings_store.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:boxes/utils/api/base_api.dart';
 import 'package:boxes/utils/api/drive/dropbox_api.dart';
@@ -38,6 +39,7 @@ class _DetailState extends State<Detail> {
   TextEditingController _passwordTextEditingController;
   Toast _toast;
   StreamSubscription<QueryResult> _stream;
+  final DatabaseService _db = DatabaseService();
   @override
   void initState() {
     _nameTextEditingController = TextEditingController(text: _serviceType);
@@ -138,6 +140,7 @@ class _DetailState extends State<Detail> {
       }
       _drives.insert(0, _newDrive);
       final _user = widget.settingsStore.appUser.copyWith();
+      await _db.insertDrive(_newDrive);
       widget.settingsStore.setAppUser(value: _user);
       widget.store.setDrive(null);
     } else

@@ -1,5 +1,5 @@
 import 'package:boxes/models/models.dart';
-import 'package:boxes/settings/settings_store.dart';
+import 'package:boxes/services/settings_store.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:boxes/utils/api/drive/drive_api_factory.dart';
 import 'package:boxes/utils/api/drive/drive_base_api.dart';

@@ -55,6 +55,9 @@ dependencies:
   graphql_flutter: ^4.0.1
   shimmer: ^1.1.2
   intl: ^0.16.1
+  file_picker_cross: ^4.3.0
+  uuid: ^2.2.2
+  cross_file: ^0.3.1+1
 
 dev_dependencies:
   build_runner: ^1.11.1

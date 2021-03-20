@@ -1,4 +1,4 @@
-import 'package:boxes/settings/settings_store.dart';
+import 'package:boxes/services/settings_store.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

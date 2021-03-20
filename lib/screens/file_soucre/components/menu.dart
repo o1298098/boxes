@@ -1,7 +1,7 @@
 import 'package:boxes/models/user_drive.dart';
 import 'package:boxes/responsive.dart';
 import 'package:boxes/screens/home/components/sliverappbar_delegate.dart';
-import 'package:boxes/settings/settings_store.dart';
+import 'package:boxes/services/settings_store.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';

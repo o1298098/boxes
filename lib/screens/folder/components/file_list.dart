@@ -82,16 +82,17 @@ class _FileListItem extends StatelessWidget {
                         token: token,
                       )),
               SizedBox(width: kDefaultPadding * .8),
-              Container(
-                constraints: BoxConstraints(maxWidth: 500),
-                child: Text(
-                  file.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: kIconColor, fontSize: 12),
+              Expanded(
+                child: Container(
+                  constraints: BoxConstraints(maxWidth: 500),
+                  child: Text(
+                    file.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: kIconColor, fontSize: 12),
+                  ),
                 ),
               ),
-              Spacer(),
               Text(
                 isFolder
                     ? '${store.fileCount(file.fileId)} files'

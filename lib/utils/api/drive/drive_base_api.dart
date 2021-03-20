@@ -1,3 +1,4 @@
+import 'package:boxes/models/file_upload.dart';
 import 'package:boxes/models/models.dart';
 
 abstract class DriveBaseApi {
@@ -19,4 +20,9 @@ abstract class DriveBaseApi {
   Future getFileMetadata(UserDrive drive, String fileId) async {}
 
   Future getTemporaryLink(UserDrive drive, String fileId) async {}
+
+  Future createUpload(UserDrive drive, FileUpload file) async {}
+
+  Future appendUpload(UserDrive drive, FileUpload file) async {}
+  Future finshUpload(UserDrive drive, FileUpload file) async {}
 }

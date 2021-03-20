@@ -4,6 +4,7 @@ import 'package:boxes/responsive.dart';
 import 'package:boxes/screens/home/home.dart';
 import 'package:boxes/screens/home/home_mobile.dart';
 import 'package:boxes/screens/main/main_store.dart';
+import 'package:boxes/screens/test/test.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -55,15 +56,7 @@ class _MainScreenState extends State<MainScreen> {
         style: TextStyle(color: Color(0xFFFFFFFF)),
       ),
     ),
-    Container(
-      height: double.infinity,
-      alignment: Alignment.center,
-      color: kBgDarkColor,
-      child: Text(
-        '5',
-        style: TextStyle(color: Color(0xFFFFFFFF)),
-      ),
-    ),
+    keepAliveWrapper(TestScreen()),
   ];
 
   @override

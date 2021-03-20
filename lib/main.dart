@@ -2,7 +2,6 @@ import 'package:boxes/screens/file_soucre/file_source.dart';
 import 'package:boxes/screens/folder/folder.dart';
 import 'package:boxes/screens/start/start.dart';
 import 'package:boxes/screens/user/account.dart';
-import 'package:boxes/utils/database_service.dart';
 import 'package:boxes/utils/platform_config.dart';
 import 'package:flutter/foundation.dart';
 
@@ -13,8 +12,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'settings/settings_store.dart';
-import 'settings/shared_preferences.dart';
+import 'services/database_service.dart';
+import 'services/settings_store.dart';
+import 'services/shared_preferences.dart';
+import 'services/upload_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +39,9 @@ class MyApp extends StatelessWidget {
         ProxyProvider<PreferencesService, SettingsStore>(
             update: (_, preferencesService, __) =>
                 SettingsStore(preferencesService)),
+        Provider<UploadService>(
+          create: (_) => UploadService()..init(),
+        ),
       ],
       child: MaterialApp(
         title: 'Boxes',

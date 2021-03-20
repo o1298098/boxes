@@ -1,10 +1,9 @@
 import 'dart:convert';
-
 import 'package:boxes/models/enums/dirve_type_enum.dart';
 import 'package:boxes/models/google/google_files.dart';
 import 'package:boxes/models/models.dart';
 import 'package:boxes/models/response_model.dart';
-import 'package:boxes/settings/settings_store.dart';
+import 'package:boxes/services/settings_store.dart';
 import 'package:boxes/utils/api/request.dart';
 import 'package:boxes/utils/app_config.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -190,5 +189,62 @@ class GoogleDriveApi extends DriveBaseApi {
     _response.nextPageToken = _result.result.nextPageToken;
     _response.hasMore = _result.result.nextPageToken != null;
     _response.files = _files;
+  }
+
+  Future createUpload(UserDrive googleDrive, FileUpload file) async {
+    final String _url =
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable';
+
+    final _data = {"name": file.name};
+    final _headers = {
+      'Authorization': 'Bearer ${googleDrive.accessToken}',
+      //'Content-Length': _data.length,
+      //"Content-Range": "bytes 0-${_data.length - 1}/${file.fileSize - 1}"
+    };
+    final _result = await _http.request(_url,
+        method: "POST", headers: _headers, data: _data);
+    String _sessionId;
+    if (_result.success)
+      _sessionId = _result.headers['x-guploader-uploadid'][0];
+    return _sessionId;
+  }
+
+  @override
+  Future appendUpload(UserDrive googleDrive, FileUpload file) async {
+    final String _url =
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&upload_id=${file.sessionId}';
+    final _data = file.uploadContent;
+    final _headers = {
+      'Authorization': 'Bearer ${googleDrive.accessToken}',
+      'Content-Range':
+          'bytes ${file.stepIndex}-${file.stepIndex + _data.length - 1}/${file.fileSize}',
+      'content-length': _data.length
+    };
+    final _result = await _http.request(_url,
+        method: "POST",
+        headers: _headers,
+        data: Stream.fromIterable(_data.map((e) => [e])));
+
+    return _result.statusCode == 308;
+  }
+
+  @override
+  Future<ResponseModel> finshUpload(
+      UserDrive googleDrive, FileUpload file) async {
+    final String _url =
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&upload_id=${file.sessionId}';
+    final _data = file.uploadContent;
+    final _headers = {
+      'Authorization': 'Bearer ${googleDrive.accessToken}',
+      'Content-Range':
+          'bytes ${file.stepIndex}-${file.stepIndex + _data.length - 1}/${file.fileSize}',
+      'content-length': _data.length
+    };
+    final _result = await _http.request(_url,
+        method: "POST",
+        headers: _headers,
+        data: Stream.fromIterable(_data.map((e) => [e])));
+
+    return _result;
   }
 }

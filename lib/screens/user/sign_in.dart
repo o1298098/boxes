@@ -3,7 +3,8 @@ import 'package:boxes/screens/user/components/github_sign_in_button.dart';
 import 'package:boxes/screens/user/components/google_sign_in_button.dart';
 import 'package:boxes/screens/user/components/input_field.dart';
 import 'package:boxes/screens/user/sign_up.dart';
-import 'package:boxes/settings/settings_store.dart';
+import 'package:boxes/services/database_service.dart';
+import 'package:boxes/services/settings_store.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:boxes/utils/api/base_api.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,7 +15,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
 import 'components/or_widget.dart';
-import 'components/right_panel.dart';
+import 'components/left_panel.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -23,6 +24,7 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final DatabaseService _db = DatabaseService();
   bool _isLoading = false;
   SettingsStore _settingsStore;
   FToast fToast;
@@ -106,6 +108,10 @@ class _SignInScreenState extends State<SignInScreen> {
             user.photoURL, user.displayName, user.phoneNumber);
         if (appUser.success) {
           await _settingsStore.setAppUser(value: appUser.result);
+          if (appUser.result.userDrives.length > 0) {
+            for (var _drive in appUser.result.userDrives)
+              await _db.insertDrive(_drive);
+          }
           Navigator.of(context).pop(true);
         } else
           _showToast('Something wrong, please try later');
@@ -151,6 +157,10 @@ class _SignInScreenState extends State<SignInScreen> {
           );
           if (appUser.success) {
             await _settingsStore.setAppUser(value: appUser.result);
+            if (appUser.result.userDrives.length > 0) {
+              for (var _drive in appUser.result.userDrives)
+                await _db.insertDrive(_drive);
+            }
             Navigator.of(context).pop();
           } else
             _showToast('Something wrong, please try later');
@@ -177,23 +187,26 @@ class _SignInScreenState extends State<SignInScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: c.maxWidth > 900
                     ? [
-                        _LeftPanel(
-                          onSubmit: _handleSubmit,
-                          onGoogleSignIn: _handleGoogleSignIn,
-                          onGithubSignIn: _handleGithubSignIn,
-                          onForgotPassword: _handleForgotPassword,
-                          onSignUp: _handleSignUp,
-                          emailTextController: _emailTextController,
-                          passwordTextController: _passwordTextController,
-                          emailFocusNode: _emailFocusNode,
-                          passwordFocusNode: _passwordFocusNode,
-                        ),
-                        const RightPanel()
+                        const LeftPanel(),
+                        Expanded(
+                            child: Center(
+                          child: _RightPanel(
+                            onSubmit: _handleSubmit,
+                            onGoogleSignIn: _handleGoogleSignIn,
+                            onGithubSignIn: _handleGithubSignIn,
+                            onForgotPassword: _handleForgotPassword,
+                            onSignUp: _handleSignUp,
+                            emailTextController: _emailTextController,
+                            passwordTextController: _passwordTextController,
+                            emailFocusNode: _emailFocusNode,
+                            passwordFocusNode: _passwordFocusNode,
+                          ),
+                        ))
                       ]
                     : [
                         Expanded(
                           child: Center(
-                            child: _LeftPanel(
+                            child: _RightPanel(
                               onSubmit: _handleSubmit,
                               onGoogleSignIn: _handleGoogleSignIn,
                               onGithubSignIn: _handleGithubSignIn,
@@ -218,7 +231,10 @@ class _SignInScreenState extends State<SignInScreen> {
               onTap: () => Navigator.of(context).pop(),
               child: Padding(
                 padding: const EdgeInsets.all(kDefaultPadding),
-                child: Icon(Icons.close),
+                child: Icon(
+                  Icons.close,
+                  color: const Color(0xFFFFFFFF),
+                ),
               ),
             ),
           ),
@@ -232,8 +248,8 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 }
 
-class _LeftPanel extends StatelessWidget {
-  const _LeftPanel({
+class _RightPanel extends StatelessWidget {
+  const _RightPanel({
     Key key,
     this.onSignUp,
     this.onGithubSignIn,
@@ -289,21 +305,12 @@ class _LeftPanel extends StatelessWidget {
               SizedBox(height: kDefaultPadding),
               OrWidget(),
               SizedBox(height: kDefaultPadding),
-              InputField(
-                controller: emailTextController,
-                focusNode: emailFocusNode,
-                inputType: TextInputType.emailAddress,
-                hintText: 'Email',
-                onSubmit: (s) => passwordFocusNode.requestFocus(),
-              ),
-              SizedBox(height: kDefaultPadding),
-              InputField(
-                controller: passwordTextController,
-                focusNode: passwordFocusNode,
-                inputType: TextInputType.visiblePassword,
-                hintText: 'Password',
-                obscureText: true,
-                onSubmit: (s) => onSubmit(),
+              _InputForm(
+                emailTextController: emailTextController,
+                emailFocusNode: emailFocusNode,
+                passwordFocusNode: passwordFocusNode,
+                passwordTextController: passwordTextController,
+                onSubmit: onSubmit,
               ),
               SizedBox(height: .5 * kDefaultPadding),
               _ForgotPassword(onForgotPassword: onForgotPassword),
@@ -313,6 +320,53 @@ class _LeftPanel extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _InputForm extends StatelessWidget {
+  const _InputForm({
+    Key key,
+    @required this.emailTextController,
+    @required this.emailFocusNode,
+    @required this.passwordFocusNode,
+    @required this.passwordTextController,
+    @required this.onSubmit,
+  }) : super(key: key);
+
+  final TextEditingController emailTextController;
+  final FocusNode emailFocusNode;
+  final FocusNode passwordFocusNode;
+  final TextEditingController passwordTextController;
+  final Function onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    return AutofillGroup(
+      child: Form(
+          child: Column(
+        children: [
+          InputField(
+            controller: emailTextController,
+            focusNode: emailFocusNode,
+            inputType: TextInputType.emailAddress,
+            hintText: 'Email',
+            autofillHints: [AutofillHints.email, AutofillHints.username],
+            textInputAction: TextInputAction.next,
+            onSubmit: (s) => passwordFocusNode.requestFocus(),
+          ),
+          SizedBox(height: kDefaultPadding),
+          InputField(
+            controller: passwordTextController,
+            focusNode: passwordFocusNode,
+            inputType: TextInputType.visiblePassword,
+            autofillHints: [AutofillHints.password],
+            hintText: 'Password',
+            obscureText: true,
+            onSubmit: (s) => onSubmit(),
+          ),
+        ],
+      )),
     );
   }
 }

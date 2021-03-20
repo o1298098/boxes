@@ -1,5 +1,5 @@
 import 'package:boxes/screens/main/main.dart';
-import 'package:boxes/settings/settings_store.dart';
+import 'package:boxes/services/settings_store.dart';
 import 'package:boxes/utils/api/drive/dropbox_api.dart';
 import 'package:boxes/utils/api/drive/google_drive_api.dart';
 import 'package:boxes/utils/app_config.dart';

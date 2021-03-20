@@ -2,7 +2,7 @@ import 'package:boxes/models/models.dart';
 import 'package:boxes/screens/folder/folder.dart';
 import 'package:boxes/screens/home/components/drives_panel.dart';
 import 'package:boxes/screens/home/home_store.dart';
-import 'package:boxes/settings/settings_store.dart';
+import 'package:boxes/services/settings_store.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

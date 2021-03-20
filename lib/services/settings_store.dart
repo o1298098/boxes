@@ -1,5 +1,5 @@
 import 'package:boxes/models/models.dart';
-import 'package:boxes/settings/shared_preferences.dart';
+import 'package:boxes/services/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
 

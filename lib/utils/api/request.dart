@@ -49,6 +49,7 @@ class Request {
       return ResponseModel<T>(
           statusCode: response.statusCode,
           message: response.statusMessage,
+          headers: response.headers.map,
           result: ModelFactory.generate(response.data));
     } on DioError catch (_) {
       print(_.message);

@@ -2,20 +2,24 @@ import 'package:boxes/style/colors.dart';
 import 'package:flutter/material.dart';
 
 class InputField extends StatelessWidget {
-  const InputField(
-      {Key key,
-      @required this.hintText,
-      this.controller,
-      this.onSubmit,
-      this.focusNode,
-      this.inputType,
-      this.obscureText = false})
-      : super(key: key);
+  const InputField({
+    Key key,
+    @required this.hintText,
+    this.controller,
+    this.onSubmit,
+    this.focusNode,
+    this.inputType,
+    this.obscureText = false,
+    this.textInputAction = TextInputAction.done,
+    this.autofillHints,
+  }) : super(key: key);
   final bool obscureText;
   final String hintText;
   final TextEditingController controller;
   final FocusNode focusNode;
   final TextInputType inputType;
+  final TextInputAction textInputAction;
+  final List<String> autofillHints;
   final Function(String) onSubmit;
 
   @override
@@ -33,9 +37,11 @@ class InputField extends StatelessWidget {
           focusNode: focusNode,
           keyboardType: inputType,
           enableSuggestions: false,
+          autofillHints: autofillHints,
           obscureText: obscureText,
           scrollPadding: EdgeInsets.zero,
           cursorColor: kBadgeColor,
+          textInputAction: textInputAction,
           decoration: InputDecoration(
             floatingLabelBehavior: FloatingLabelBehavior.never,
             contentPadding: EdgeInsets.zero,

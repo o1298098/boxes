@@ -1,3 +1,4 @@
+import 'dart:convert' show json;
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -19,11 +20,12 @@ class DriveType {
     return '{"id": $id, "name": "${name ?? ''}", "code": "${code ?? ''}"}';
   }
 
-  factory DriveType.fromJson(Map<String, dynamic> json) {
+  factory DriveType.fromJson(dynamic map) {
+    Map<String, dynamic> _json = map is String ? json.decode(map) : map;
     return DriveType(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      code: json['code'] as String,
+      id: _json['id'] as int,
+      name: _json['name'] as String,
+      code: _json['code'] as String,
     );
   }
 

@@ -2,7 +2,7 @@ import 'package:boxes/components/loading_layout.dart';
 import 'package:boxes/screens/user/components/github_sign_in_button.dart';
 import 'package:boxes/screens/user/components/google_sign_in_button.dart';
 import 'package:boxes/screens/user/components/or_widget.dart';
-import 'package:boxes/settings/settings_store.dart';
+import 'package:boxes/services/settings_store.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:boxes/utils/api/base_api.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,7 +13,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
 import 'components/input_field.dart';
-import 'components/right_panel.dart';
+import 'components/left_panel.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -173,23 +173,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: c.maxWidth > 900
                     ? [
-                        _LeftPanel(
-                          onGoogleSignIn: _handleGoogleSignIn,
-                          onSignIn: _handleSignIn,
-                          onSubmit: _handleSubmit,
-                          nameTextController: _nameTextController,
-                          emailTextController: _emailTextController,
-                          passwordTextController: _passwordTextController,
-                          emailFocusNode: _emailFocusNode,
-                          passwordFocusNode: _passwordFocusNode,
-                          nameFocusNode: _nameFocusNode,
+                        const LeftPanel(),
+                        Expanded(
+                          child: Center(
+                            child: _RightPanel(
+                              onGoogleSignIn: _handleGoogleSignIn,
+                              onSignIn: _handleSignIn,
+                              onSubmit: _handleSubmit,
+                              nameTextController: _nameTextController,
+                              emailTextController: _emailTextController,
+                              passwordTextController: _passwordTextController,
+                              emailFocusNode: _emailFocusNode,
+                              passwordFocusNode: _passwordFocusNode,
+                              nameFocusNode: _nameFocusNode,
+                            ),
+                          ),
                         ),
-                        const RightPanel(),
                       ]
                     : [
                         Expanded(
                           child: Center(
-                            child: _LeftPanel(
+                            child: _RightPanel(
                               onGoogleSignIn: _handleGoogleSignIn,
                               onSignIn: _handleSignIn,
                               onSubmit: _handleSubmit,
@@ -212,7 +216,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
               onTap: () => Navigator.of(context).pop(true),
               child: Padding(
                 padding: const EdgeInsets.all(kDefaultPadding),
-                child: Icon(Icons.close),
+                child: Icon(
+                  Icons.close,
+                  color: const Color(0xFFFFFFFF),
+                ),
               ),
             ),
           ),
@@ -226,8 +233,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 }
 
-class _LeftPanel extends StatelessWidget {
-  const _LeftPanel({
+class _RightPanel extends StatelessWidget {
+  const _RightPanel({
     Key key,
     this.onSignIn,
     this.onGithubSignIn,
@@ -285,29 +292,14 @@ class _LeftPanel extends StatelessWidget {
               SizedBox(height: kDefaultPadding),
               OrWidget(),
               SizedBox(height: kDefaultPadding),
-              InputField(
-                controller: nameTextController,
-                focusNode: nameFocusNode,
-                inputType: TextInputType.name,
-                hintText: 'Name',
-                onSubmit: (s) => emailFocusNode.requestFocus(),
-              ),
-              SizedBox(height: kDefaultPadding),
-              InputField(
-                controller: emailTextController,
-                focusNode: emailFocusNode,
-                inputType: TextInputType.emailAddress,
-                hintText: 'Email',
-                onSubmit: (s) => passwordFocusNode.requestFocus(),
-              ),
-              SizedBox(height: kDefaultPadding),
-              InputField(
-                controller: passwordTextController,
-                focusNode: passwordFocusNode,
-                inputType: TextInputType.visiblePassword,
-                hintText: 'Password',
-                obscureText: true,
-                onSubmit: (s) => onSubmit(),
+              _InputForm(
+                nameTextController: nameTextController,
+                nameFocusNode: nameFocusNode,
+                emailFocusNode: emailFocusNode,
+                emailTextController: emailTextController,
+                passwordFocusNode: passwordFocusNode,
+                passwordTextController: passwordTextController,
+                onSubmit: onSubmit,
               ),
               SizedBox(height: .5 * kDefaultPadding),
               SizedBox(height: 3 * kDefaultPadding),
@@ -315,6 +307,64 @@ class _LeftPanel extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _InputForm extends StatelessWidget {
+  const _InputForm({
+    Key key,
+    @required this.nameTextController,
+    @required this.nameFocusNode,
+    @required this.emailFocusNode,
+    @required this.emailTextController,
+    @required this.passwordFocusNode,
+    @required this.passwordTextController,
+    @required this.onSubmit,
+  }) : super(key: key);
+
+  final TextEditingController nameTextController;
+  final FocusNode nameFocusNode;
+  final FocusNode emailFocusNode;
+  final TextEditingController emailTextController;
+  final FocusNode passwordFocusNode;
+  final TextEditingController passwordTextController;
+  final Function onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    return AutofillGroup(
+      child: Form(
+        child: Column(children: [
+          InputField(
+            controller: nameTextController,
+            focusNode: nameFocusNode,
+            inputType: TextInputType.name,
+            hintText: 'Name',
+            autofillHints: [AutofillHints.nickname],
+            onSubmit: (s) => emailFocusNode.requestFocus(),
+          ),
+          SizedBox(height: kDefaultPadding),
+          InputField(
+            controller: emailTextController,
+            focusNode: emailFocusNode,
+            inputType: TextInputType.emailAddress,
+            hintText: 'Email',
+            autofillHints: [AutofillHints.email, AutofillHints.newUsername],
+            onSubmit: (s) => passwordFocusNode.requestFocus(),
+          ),
+          SizedBox(height: kDefaultPadding),
+          InputField(
+            controller: passwordTextController,
+            focusNode: passwordFocusNode,
+            inputType: TextInputType.visiblePassword,
+            hintText: 'Password',
+            autofillHints: [AutofillHints.newPassword],
+            obscureText: true,
+            onSubmit: (s) => onSubmit(),
+          ),
+        ]),
       ),
     );
   }

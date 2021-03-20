@@ -5,9 +5,10 @@ import 'package:boxes/models/drive_usage.dart';
 import 'package:boxes/models/dropbox/drop_box_thumbnails.dart';
 import 'package:boxes/models/dropbox/dropbox_files.dart';
 import 'package:boxes/models/enums/dirve_type_enum.dart';
+import 'package:boxes/models/file_upload.dart';
 import 'package:boxes/models/models.dart';
 import 'package:boxes/models/response_model.dart';
-import 'package:boxes/settings/settings_store.dart';
+import 'package:boxes/services/settings_store.dart';
 import 'package:boxes/utils/api/request.dart';
 import 'package:boxes/utils/app_config.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -174,7 +175,6 @@ class DropboxApi extends DriveBaseApi {
     final String _url = '/2/files/list_folder';
     final _headers = {
       'Authorization': 'Bearer ${dropbox.accessToken}',
-      'Content-Type': 'application/json'
     };
     final _data = {
       "path": folder.fileId,
@@ -327,6 +327,75 @@ class DropboxApi extends DriveBaseApi {
       };
     }
     return _metadata;
+  }
+
+  ///Upload sessions allow you to upload a single file in one or more requests,
+  ///for example where the size of the file is greater than 150 MB.
+  ///This call starts a new upload session with the given data.
+  ///You can then use upload_session/append:2 to add more data and upload_session/finish to save all the data to a file in Dropbox.
+  ///A single request should not upload more than 150 MB.
+  ///The maximum size of a file one can upload to an upload session is 350 GB.
+  @override
+  Future createUpload(UserDrive dropbox, FileUpload file) async {
+    final String _url =
+        'https://content.dropboxapi.com/2/files/upload_session/start';
+    final _headers = {
+      'Authorization': 'Bearer ${dropbox.accessToken}',
+      "content-type": "application/octet-stream",
+      "content-length": 0,
+    };
+    final _result = await _http.request(_url,
+        method: "POST",
+        headers: _headers,
+        data: Stream<List<int>>.fromIterable([]));
+    String _sessionId;
+    if (_result.success) _sessionId = _result.result["session_id"];
+    return _sessionId;
+  }
+
+  ///Append more data to an upload session.
+  ///session_id String The upload session ID (returned by upload_session/start).
+  ///[offset] UInt64 Offset in bytes at which data should be appended.
+  ///We use this to make sure upload data isn't lost or duplicated in the event of a network error.
+  @override
+  Future appendUpload(UserDrive dropbox, FileUpload file) async {
+    final String _url =
+        'https://content.dropboxapi.com/2/files/upload_session/append_v2';
+    final _data = file.uploadContent;
+    final _headers = {
+      'Authorization': 'Bearer ${dropbox.accessToken}',
+      "content-type": "application/octet-stream",
+      "content-length": _data.length,
+      "Dropbox-API-Arg":
+          "{\"cursor\": {\"session_id\": \"${file.sessionId}\",\"offset\": ${file.stepIndex}},\"close\": false}",
+    };
+    final _result = await _http.request(_url,
+        method: "POST",
+        headers: _headers,
+        data: Stream.fromIterable(_data.map((e) => [e])));
+
+    return _result.success;
+  }
+
+  @override
+  Future<ResponseModel> finshUpload(UserDrive dropbox, FileUpload file) async {
+    final String _url =
+        'https://content.dropboxapi.com/2/files/upload_session/finish';
+
+    final _data = file.uploadContent;
+    final _headers = {
+      'Authorization': 'Bearer ${dropbox.accessToken}',
+      "content-type": "application/octet-stream",
+      "content-length": _data.length,
+      "Dropbox-API-Arg":
+          "{\"cursor\": {\"session_id\": \"${file.sessionId}\",\"offset\": ${file.stepIndex}},\"commit\": {\"path\": \"/${file.name}\",\"mode\": \"add\",\"autorename\": true,\"mute\": false,\"strict_conflict\": false}}",
+    };
+    final _result = await _http.request(_url,
+        method: "POST",
+        headers: _headers,
+        data: Stream.fromIterable(_data.map((e) => [e])));
+
+    return _result;
   }
 
   _fileExtension(String path) {

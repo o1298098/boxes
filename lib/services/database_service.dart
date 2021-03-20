@@ -1,4 +1,5 @@
 import 'package:boxes/models/drive_file.dart';
+import 'package:boxes/models/models.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -14,13 +15,15 @@ class DatabaseService {
     initDatabase();
   }
   final _fileTable = 'files';
+  final _uploadTable = 'uploadFiles';
+  final _driveTable = 'drives';
   initDatabase() async {
     //deleteDatabase(join(await getDatabasesPath(), 'boxes_database.db'));
     database = openDatabase(
       join(await getDatabasesPath(), 'boxes_database.db'),
       // When the database is first created, create a table to store data.
-      onCreate: (db, version) {
-        db.execute(
+      onCreate: (db, version) async {
+        await db.execute(
           '''
           CREATE TABLE $_fileTable(
             fileId TEXT PRIMARY KEY,
@@ -37,7 +40,37 @@ class DatabaseService {
             parentId TEXT,
             type TEXT,
             driveType INTEGER,
-            modifiedDate TEXT)
+            modifiedDate TEXT);
+            ''',
+        );
+        await db.execute(
+          '''         
+          CREATE TABLE $_uploadTable(
+            uploadId TEXT PRIMARY KEY,
+            sessionId TEXT,
+            driveId INTEGER,
+            name TEXT,
+            stepIndex INTEGER,
+            fileSize INTEGER,
+            filePath TEXT,
+            status INTEGER,
+            uploadDate TEXT);
+          ''',
+        );
+        await db.execute(
+          '''        
+          CREATE TABLE $_driveTable(
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            accessToken TEXT,
+            scope TEXT,
+            refreshToken TEXT,
+            tokenType TEXT,
+            driveId TEXT,
+            expiresIn TEXT,
+            updateTime TEXT,
+            driveTypeNavigation TEXT,
+            driveUsage TEXT)
           ''',
         );
       },
@@ -95,6 +128,53 @@ class DatabaseService {
       _fileTable,
       where: 'driveId = ? and parentId = ?',
       whereArgs: [driveId, folderId],
+    );
+  }
+
+  Future<void> insertUploadFile(FileUpload file) async {
+    final Database db = await database;
+    await db.insert(
+      _uploadTable,
+      file.toJson(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<FileUpload>> getUploadList() async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(_uploadTable);
+    return List.generate(maps.length, (i) => FileUpload.fromJson(maps[i]));
+  }
+
+  Future<void> insertDrive(UserDrive drive) async {
+    final Database db = await database;
+    await db.insert(
+      _driveTable,
+      drive.toJson(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<UserDrive>> getDrive(int driveId) async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps =
+        await db.query(_driveTable, where: 'id = ?', whereArgs: [driveId]);
+    return List.generate(maps.length, (i) => UserDrive.fromJson(maps[i]));
+  }
+
+  Future<List<UserDrive>> getDrvieList() async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(_driveTable);
+    return List.generate(maps.length, (i) => UserDrive.fromJson(maps[i]));
+  }
+
+  Future<void> deleteDrive(int driveId) async {
+    final db = await database;
+
+    await db.delete(
+      _driveTable,
+      where: "id = ?",
+      whereArgs: [driveId],
     );
   }
 }

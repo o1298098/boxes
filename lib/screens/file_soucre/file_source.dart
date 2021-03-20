@@ -1,6 +1,6 @@
 import 'package:boxes/responsive.dart';
 import 'package:boxes/screens/file_soucre/file_source_store.dart';
-import 'package:boxes/settings/settings_store.dart';
+import 'package:boxes/services/settings_store.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
