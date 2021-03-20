@@ -53,6 +53,8 @@ class DatabaseService {
             stepIndex INTEGER,
             fileSize INTEGER,
             filePath TEXT,
+            folderPath TEXT,
+            folderId TEXT,
             status INTEGER,
             uploadDate TEXT);
           ''',
@@ -137,6 +139,16 @@ class DatabaseService {
       _uploadTable,
       file.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> deleteUploadFile(String uploadId) async {
+    final db = await database;
+
+    await db.delete(
+      _uploadTable,
+      where: "uploadId = ?",
+      whereArgs: [uploadId],
     );
   }
 

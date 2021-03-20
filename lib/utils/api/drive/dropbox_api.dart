@@ -388,7 +388,7 @@ class DropboxApi extends DriveBaseApi {
       "content-type": "application/octet-stream",
       "content-length": _data.length,
       "Dropbox-API-Arg":
-          "{\"cursor\": {\"session_id\": \"${file.sessionId}\",\"offset\": ${file.stepIndex}},\"commit\": {\"path\": \"/${file.name}\",\"mode\": \"add\",\"autorename\": true,\"mute\": false,\"strict_conflict\": false}}",
+          "{\"cursor\": {\"session_id\": \"${file.sessionId}\",\"offset\": ${file.stepIndex}},\"commit\": {\"path\": \"${file.folderPath}${file.name}\",\"mode\": \"add\",\"autorename\": true,\"mute\": false,\"strict_conflict\": false}}",
     };
     final _result = await _http.request(_url,
         method: "POST",

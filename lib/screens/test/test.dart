@@ -23,6 +23,7 @@ class TestScreen extends StatelessWidget {
                   d: service.queue[index],
                   onStop: (d) => service.stop(d.uploadId),
                   onStart: (d) => service.start(d.uploadId),
+                  onDelete: (d) => service.delete(d.uploadId),
                 );
               },
               separatorBuilder: (_, index) => SizedBox(),
@@ -41,12 +42,14 @@ class _UploadItem extends StatelessWidget {
     @required FileUpload d,
     this.onStop,
     this.onStart,
+    this.onDelete,
   })  : _d = d,
         super(key: key);
 
   final FileUpload _d;
   final Function(FileUpload file) onStop;
   final Function(FileUpload file) onStart;
+  final Function(FileUpload file) onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +82,14 @@ class _UploadItem extends StatelessWidget {
                 color: Color(0xFFFFFFFF),
               ),
               onPressed: () => onStart(_d),
+            ),
+            SizedBox(width: 20),
+            IconButton(
+              icon: Icon(
+                Icons.delete,
+                color: Color(0xFFFF0000),
+              ),
+              onPressed: () => onDelete(_d),
             )
           ],
         ),

@@ -14,7 +14,8 @@ abstract class _FileUploadStore with Store {
   String sessionId;
   final String name;
   final String filePath;
-
+  final String folderId;
+  final String folderPath;
   @observable
   int stepIndex;
   final int fileSize;
@@ -31,6 +32,8 @@ abstract class _FileUploadStore with Store {
       this.sessionId,
       this.name,
       this.filePath,
+      this.folderId,
+      this.folderPath,
       this.stepIndex,
       this.fileSize,
       this.uploadDate,

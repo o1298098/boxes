@@ -1,22 +1,30 @@
+import 'package:boxes/models/enums/upload_status.dart';
 import 'package:boxes/models/models.dart';
 import 'package:boxes/models/response_model.dart';
 import 'package:boxes/services/database_service.dart';
+import 'package:boxes/services/upload_service.dart';
 import 'package:boxes/utils/api/drive/drive_api_factory.dart';
 import 'package:boxes/utils/api/drive/drive_base_api.dart';
+import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
+import 'package:uuid/uuid.dart';
 
 part 'folder_store.g.dart';
 
 class FolderStore = _FolderStore with _$FolderStore;
 
 abstract class _FolderStore with Store {
-  _FolderStore(this.drive) {
+  _FolderStore(this.drive, {this.uploadService}) {
     _api = DriveApiFactory.getInstance(drive.driveType.id);
+    if (uploadService != null)
+      uploadService.callbackWhenUploadFinsh = _uploadFinshCallBack;
     _init();
   }
 
   DriveBaseApi _api;
+
+  UploadService uploadService;
 
   final List<DriveFile> _fileIndex = [];
 
@@ -107,8 +115,8 @@ abstract class _FolderStore with Store {
         }
         _files.removeWhere((e) => files.any((d) => d.fileId == e.fileId));
         _folders.removeWhere((e) => folders.any((d) => d.fileId == e.fileId));
-        files.addAll(_files);
-        folders.addAll(_folders);
+        files.insertAll(0, _files);
+        folders.insertAll(0, _folders);
         //files.sort((a, b) => (b.modifiedDate.isBefore(a.modifiedDate) ? 0 : 1));
       }
       loading = false;
@@ -272,6 +280,25 @@ abstract class _FolderStore with Store {
     displayAsList = !displayAsList;
   }
 
+  void onUploadFile() async {
+    final _files = await FilePickerCross.importFromStorage();
+    final _file = _files.toUint8List().buffer;
+    final _pathStr = path.skip(1).map((e) => e.name).join('/');
+    FileUpload _fileUpload = FileUpload(
+        uploadId: Uuid().v1(),
+        driveId: drive.id,
+        name: _files.fileName,
+        folderId: _currectFolderId,
+        folderPath: '/${_pathStr.isEmpty ? '' : _pathStr + '/'}',
+        filePath: _files.path,
+        uploadDate: DateTime.now(),
+        fileSize: _files.length,
+        stepIndex: 0,
+        status: UploadStatus.waiting,
+        data: _file);
+    uploadService.uploadFile(drive, _fileUpload);
+  }
+
   void _updatePath({Item folder}) {
     if (folder == null) {
       path.clear();
@@ -286,6 +313,14 @@ abstract class _FolderStore with Store {
       return;
     } else
       path = path..add(Item(name: folder.name, value: folder.value));
+  }
+
+  _uploadFinshCallBack(FileUpload file) async {
+    if (file.driveId != drive.id) return;
+    if (_isRoot) await loadFolder(_rootFolder);
+    final _folder = _fileIndex.firstWhere((e) => e.fileId == _currectFolderId,
+        orElse: () => null);
+    if (_folder != null) await loadFolder(_folder);
   }
 
   bool _shouldAutoRefresh(DriveFile folder) {

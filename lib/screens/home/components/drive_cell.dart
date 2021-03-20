@@ -106,7 +106,7 @@ class _DriveCellState extends State<DriveCell> {
               ),
             ),
             Spacer(),
-            _DataBar(
+            _ProgressBar(
               used: _usage?.used ?? 0,
               total: _usage?.allocated ?? 1,
             )
@@ -117,10 +117,10 @@ class _DriveCellState extends State<DriveCell> {
   }
 }
 
-class _DataBar extends StatelessWidget {
+class _ProgressBar extends StatelessWidget {
   final int used;
   final int total;
-  const _DataBar({this.total = 15, this.used = 4});
+  const _ProgressBar({this.total = 15, this.used = 4});
   @override
   Widget build(BuildContext context) {
     final _fontSize = 8.0;

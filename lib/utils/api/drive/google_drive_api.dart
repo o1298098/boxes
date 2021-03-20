@@ -195,7 +195,11 @@ class GoogleDriveApi extends DriveBaseApi {
     final String _url =
         'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable';
 
-    final _data = {"name": file.name};
+    final Map<String, dynamic> _data = {"name": file.name};
+    if (file.folderId != null)
+      _data.addAll({
+        "parents": [file.folderId]
+      });
     final _headers = {
       'Authorization': 'Bearer ${googleDrive.accessToken}',
       //'Content-Length': _data.length,

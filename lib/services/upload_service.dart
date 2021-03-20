@@ -18,6 +18,8 @@ abstract class _UploadService with Store {
   final DatabaseService _db = DatabaseService();
   final int _uploadSize = 256 * 1024;
   final List<UserDrive> _drives = [];
+
+  Function(FileUpload file) callbackWhenUploadFinsh;
   //final int _maxUploadTask = 5;
   init() {
     _db.getUploadList().then((list) {
@@ -27,12 +29,16 @@ abstract class _UploadService with Store {
     });
   }
 
+  ///upload file to cloud storage.
+  ///
+  ///this function will creata resumable upload, one upload session will keep alive for 7 days
   uploadFile(UserDrive drive, FileUpload file) async {
     final _newfile = file.copyWith(uploadSize: _uploadSize);
     await _updateQueue(_newfile);
     _createUpdateSession(drive, _newfile);
   }
 
+  ///start a upload session in upload queue
   start(String uploadId) async {
     final FileUpload _file = _getUploadFile(uploadId);
     if (_file == null) return;
@@ -56,9 +62,16 @@ abstract class _UploadService with Store {
   }
 
   startALl() {}
+
   stopAll() {}
-  delete() {}
+
+  delete(String uploadId) async {
+    await _db.deleteUploadFile(uploadId);
+    queue.removeWhere((e) => e.uploadId == uploadId);
+  }
+
   retry() {}
+
   Future<bool> stop(String uploadId) async {
     final _file = _getUploadFile(uploadId);
     if (_file != null) {
@@ -91,6 +104,7 @@ abstract class _UploadService with Store {
       } else {
         //print('offset:${file.stepIndex + _lenght}');
         final _file = _getUploadFile(file.uploadId);
+        if (_file == null) return;
         _file.stepIndex = file.stepIndex + _lenght;
         await _updateQueue(_file);
         await _uploading(drive, _file, api);
@@ -106,7 +120,7 @@ abstract class _UploadService with Store {
       file.stepIndex = file.fileSize;
       file.status = UploadStatus.finsh;
       await _updateQueue(file);
-
+      if (callbackWhenUploadFinsh != null) callbackWhenUploadFinsh(file);
       print(_result.result);
     } else
       print('upload false');

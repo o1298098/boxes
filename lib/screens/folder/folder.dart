@@ -1,19 +1,17 @@
 import 'package:boxes/components/custom_app_bar.dart';
-import 'package:boxes/models/enums/upload_status.dart';
-import 'package:boxes/models/file_upload.dart';
+import 'package:boxes/components/overlay_entry_manage.dart';
 import 'package:boxes/models/models.dart';
 import 'package:boxes/screens/folder/components/file_preview.dart';
 import 'package:boxes/screens/folder/components/folder_path.dart';
+import 'package:boxes/screens/folder/components/upload_menu.dart';
 import 'package:boxes/screens/folder/folder_store.dart';
 import 'package:boxes/screens/home/components/sliverappbar_delegate.dart';
 import 'package:boxes/services/upload_service.dart';
 import 'package:boxes/style/colors.dart';
-import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
 
 import 'components/file_grid.dart';
 import 'components/file_list.dart';
@@ -33,14 +31,17 @@ class _FolderScreenState extends State<FolderScreen>
   ScrollController _controller;
   FolderStore _store;
   AnimationController _previewController;
-  UploadService _uploadService;
+
+  final GlobalKey<OverlayEntryManageState> _overlayStateKey =
+      GlobalKey<OverlayEntryManageState>();
 
   @override
   void initState() {
     _previewController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 200));
-    _uploadService = Provider.of<UploadService>(context, listen: false);
-    _store = FolderStore(widget.drive)..previewShow = _showPreview;
+    _store = FolderStore(widget.drive,
+        uploadService: Provider.of<UploadService>(context, listen: false))
+      ..previewShow = _showPreview;
     _controller = ScrollController()
       ..addListener(() {
         bool _isBottom =
@@ -66,19 +67,25 @@ class _FolderScreenState extends State<FolderScreen>
   }
 
   _onAdd() async {
-    final _files = await FilePickerCross.importFromStorage();
-    final _file = _files.toUint8List().buffer;
-    FileUpload _fileUpload = FileUpload(
-        uploadId: Uuid().v1(),
-        driveId: widget.drive.id,
-        name: _files.fileName,
-        filePath: _files.path,
-        uploadDate: DateTime.now(),
-        fileSize: _files.length,
-        stepIndex: 0,
-        status: UploadStatus.waiting,
-        data: _file);
-    _uploadService.uploadFile(widget.drive, _fileUpload);
+    _store.onUploadFile();
+  }
+
+  void _closeMenu(OverlayEntry overlayEntry) {
+    overlayEntry?.remove();
+    _overlayStateKey.currentState.setOverlayEntry(null);
+    overlayEntry = null;
+  }
+
+  void _showUploadMenu() {
+    OverlayEntry menuOverlayEntry;
+    menuOverlayEntry = OverlayEntry(
+        builder: (context) => UploadMenu(
+              showPreview: _previewController.value == 1,
+              closeMenu: () => _closeMenu(menuOverlayEntry),
+              onUpload: () => _store.onUploadFile(),
+            ));
+    _overlayStateKey.currentState.setOverlayEntry(menuOverlayEntry);
+    Overlay.of(context).insert(menuOverlayEntry);
   }
 
   @override
@@ -89,12 +96,15 @@ class _FolderScreenState extends State<FolderScreen>
         Row(
           children: [
             Expanded(
-              child: _Folder(
-                controller: _controller,
-                drive: widget.drive,
-                onPop: widget.onPop,
-                store: _store,
-                onAdd: () async => await _onAdd(),
+              child: OverlayEntryManage(
+                key: _overlayStateKey,
+                child: _Folder(
+                  controller: _controller,
+                  drive: widget.drive,
+                  onPop: widget.onPop,
+                  store: _store,
+                  onAdd: _showUploadMenu,
+                ),
               ),
             ),
             AnimatedBuilder(
