@@ -24,5 +24,10 @@ abstract class DriveBaseApi {
   Future createUpload(UserDrive drive, FileUpload file) async {}
 
   Future appendUpload(UserDrive drive, FileUpload file) async {}
+
   Future finshUpload(UserDrive drive, FileUpload file) async {}
+
+  Future createFolder(UserDrive drive, FileUpload folder) async {}
+
+  Future deleteFile(UserDrive drive, DriveFile file) async {}
 }

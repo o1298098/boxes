@@ -18,7 +18,8 @@ abstract class _FolderStore with Store {
   _FolderStore(this.drive, {this.uploadService}) {
     _api = DriveApiFactory.getInstance(drive.driveType.id);
     if (uploadService != null)
-      uploadService.callbackWhenUploadFinsh = _uploadFinshCallBack;
+      uploadService.callbackWhenUploadFinsh =
+          (file) async => await _uploadFinshCallBack(file);
     _init();
   }
 
@@ -315,7 +316,34 @@ abstract class _FolderStore with Store {
       path = path..add(Item(name: folder.name, value: folder.value));
   }
 
-  _uploadFinshCallBack(FileUpload file) async {
+  @action
+  Future<bool> createFolder(String folderName) async {
+    print(folderName);
+    if (folderName?.isNotEmpty == true) {
+      final _pathStr = path.skip(1).map((e) => e.name).join('/');
+      FileUpload _newFolder = FileUpload(
+        uploadId: Uuid().v1(),
+        driveId: drive.id,
+        name: folderName,
+        folderId: _currectFolderId,
+        folderPath: '/${_pathStr.isEmpty ? '' : _pathStr + '/'}',
+        filePath: '',
+        uploadDate: DateTime.now(),
+        fileSize: 0,
+        stepIndex: 0,
+      );
+      final DriveFile _folder = await _api.createFolder(drive, _newFolder);
+      if (_folder != null) {
+        folders.insert(0, _folder);
+        _fileIndex.add(_folder);
+        await _db.insertFile(_folder);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future _uploadFinshCallBack(FileUpload file) async {
     if (file.driveId != drive.id) return;
     if (_isRoot) await loadFolder(_rootFolder);
     final _folder = _fileIndex.firstWhere((e) => e.fileId == _currectFolderId,

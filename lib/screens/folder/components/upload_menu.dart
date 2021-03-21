@@ -3,6 +3,7 @@ import 'package:boxes/models/file_upload.dart';
 import 'package:boxes/services/upload_service.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:boxes/utils/calculation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -150,7 +151,7 @@ class _UploadItem extends StatelessWidget {
                 _d.name,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 8,
+                  fontSize: 10,
                   color: kGrayColor,
                 ),
               ),
@@ -195,14 +196,14 @@ class _UploadPanel extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.cloud_upload_outlined,
+              CupertinoIcons.cloud_upload,
               size: 16,
               color: kPrimaryColor,
             ),
             SizedBox(width: kDefaultPadding * .5),
             RichText(
               text: TextSpan(
-                style: TextStyle(fontSize: 10),
+                style: TextStyle(fontSize: 12),
                 children: [
                   TextSpan(
                       text: 'Drag and drop',
@@ -224,7 +225,7 @@ class _ProgressBar extends StatelessWidget {
   const _ProgressBar({this.total = 1, this.step = 0});
   @override
   Widget build(BuildContext context) {
-    final _fontSize = 6.0;
+    final _fontSize = 8.0;
     final _barHeight = 4.0;
     final _radius = _barHeight / 2;
     final _p = (step / total).toDouble();

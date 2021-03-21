@@ -102,7 +102,9 @@ class DropboxApi extends DriveBaseApi {
         _data = _result.result;
       _newToken = _data['access_token'];
       if (_newToken != null) {
-        final _dropboxIndex = store.appUser.userDrives.indexOf(_userDropbox);
+        final _dropboxIndex =
+            store.appUser.userDrives.indexWhere((e) => e.id == _userDropbox.id);
+        if (_dropboxIndex == -1) return '';
         final _user = store.appUser.copyWith();
         _user.userDrives[_dropboxIndex].accessToken = _newToken;
         store.setAppUser(value: _user);
@@ -337,6 +339,7 @@ class DropboxApi extends DriveBaseApi {
   ///The maximum size of a file one can upload to an upload session is 350 GB.
   @override
   Future createUpload(UserDrive dropbox, FileUpload file) async {
+    _userDropbox = dropbox;
     final String _url =
         'https://content.dropboxapi.com/2/files/upload_session/start';
     final _headers = {
@@ -359,6 +362,7 @@ class DropboxApi extends DriveBaseApi {
   ///We use this to make sure upload data isn't lost or duplicated in the event of a network error.
   @override
   Future appendUpload(UserDrive dropbox, FileUpload file) async {
+    _userDropbox = dropbox;
     final String _url =
         'https://content.dropboxapi.com/2/files/upload_session/append_v2';
     final _data = file.uploadContent;
@@ -379,6 +383,7 @@ class DropboxApi extends DriveBaseApi {
 
   @override
   Future<ResponseModel> finshUpload(UserDrive dropbox, FileUpload file) async {
+    _userDropbox = dropbox;
     final String _url =
         'https://content.dropboxapi.com/2/files/upload_session/finish';
 
@@ -396,6 +401,52 @@ class DropboxApi extends DriveBaseApi {
         data: Stream.fromIterable(_data.map((e) => [e])));
 
     return _result;
+  }
+
+  @override
+  Future<DriveFile> createFolder(UserDrive dropbox, FileUpload file) async {
+    _userDropbox = dropbox;
+    DriveFile _folder;
+    final _url = '/2/files/create_folder_v2';
+    final _headers = {
+      'Authorization': 'Bearer ${dropbox.accessToken}',
+    };
+    final _data = {
+      'path': '${file.folderPath}${file.name}',
+      'autorename': false
+    };
+    final _result = await _http.request(_url,
+        method: "POST", headers: _headers, data: _data);
+    if (_result.success) {
+      final _e = _result.result['metadata'];
+      _folder = DriveFile(
+        fileId: _e['id'],
+        name: _e['name'],
+        filePath: _e['path_lower'],
+        type: 'folder',
+        modifiedDate: DateTime.now(),
+        size: 0,
+        isDownloadable: false,
+        fileExtension: '',
+        driveType: DriveTypeEnum.dropbox,
+        driveId: dropbox.id,
+        parentId: file.folderId,
+      );
+    }
+    return _folder;
+  }
+
+  @override
+  Future<bool> deleteFile(UserDrive dropbox, DriveFile file) async {
+    _userDropbox = dropbox;
+    final _url = '/2/files/delete_v2';
+    final _headers = {
+      'Authorization': 'Bearer ${dropbox.accessToken}',
+    };
+    final _data = {'path': file.filePath};
+    final _result = await _http.request(_url,
+        method: "POST", headers: _headers, data: _data);
+    return _result.success;
   }
 
   _fileExtension(String path) {

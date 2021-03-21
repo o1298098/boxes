@@ -1,6 +1,7 @@
 import 'package:boxes/components/custom_app_bar.dart';
 import 'package:boxes/components/overlay_entry_manage.dart';
 import 'package:boxes/models/models.dart';
+import 'package:boxes/screens/folder/components/create_folder_dialog.dart';
 import 'package:boxes/screens/folder/components/file_preview.dart';
 import 'package:boxes/screens/folder/components/folder_path.dart';
 import 'package:boxes/screens/folder/components/upload_menu.dart';
@@ -66,10 +67,6 @@ class _FolderScreenState extends State<FolderScreen>
     _previewController.reverse();
   }
 
-  _onAdd() async {
-    _store.onUploadFile();
-  }
-
   void _closeMenu(OverlayEntry overlayEntry) {
     overlayEntry?.remove();
     _overlayStateKey.currentState.setOverlayEntry(null);
@@ -88,6 +85,13 @@ class _FolderScreenState extends State<FolderScreen>
     Overlay.of(context).insert(menuOverlayEntry);
   }
 
+  void _createFolder() {
+    showDialog(
+      context: context,
+      builder: (_) => CreateFolderDialog(store: _store),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -104,6 +108,7 @@ class _FolderScreenState extends State<FolderScreen>
                   onPop: widget.onPop,
                   store: _store,
                   onAdd: _showUploadMenu,
+                  createFolder: _createFolder,
                 ),
               ),
             ),
@@ -144,15 +149,17 @@ class _Folder extends StatelessWidget {
   final Function onPop;
   final FolderStore store;
   final Function onAdd;
+  final Function createFolder;
 
-  const _Folder(
-      {Key key,
-      this.controller,
-      this.drive,
-      this.onPop,
-      this.store,
-      this.onAdd})
-      : super(key: key);
+  const _Folder({
+    Key key,
+    this.controller,
+    this.drive,
+    this.onPop,
+    this.store,
+    this.onAdd,
+    this.createFolder,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -167,9 +174,8 @@ class _Folder extends StatelessWidget {
           title: 'Files',
           show: (store.files?.length ?? 0) > 0 || store.loading,
         ),
-        FileGrid(
-          store: store,
-        )
+        FileGrid(store: store),
+        SliverToBoxAdapter(child: SizedBox(height: kDefaultPadding)),
       ];
     }
 
@@ -192,19 +198,17 @@ class _Folder extends StatelessWidget {
                       needBackButton: true,
                       backButtonTap: onPop,
                       actions: [
-                        InkWell(
-                          onTap: onAdd,
-                          child: Icon(
-                            CupertinoIcons.add_circled,
-                            color: kIconColor,
-                            size: 18,
-                          ),
+                        _ActionButton(
+                          icon: CupertinoIcons.folder_badge_plus,
+                          onTap: createFolder,
                         ),
-                        SizedBox(width: kDefaultPadding),
-                        Icon(
-                          CupertinoIcons.search,
-                          color: kIconColor,
-                          size: 18,
+                        _ActionButton(
+                          icon: CupertinoIcons.cloud_upload,
+                          onTap: onAdd,
+                        ),
+                        _ActionButton(
+                          icon: CupertinoIcons.search,
+                          onTap: () {},
                         ),
                       ],
                     ),
@@ -233,6 +237,33 @@ class _Folder extends StatelessWidget {
                   : _buildGrid()),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    Key key,
+    @required this.onTap,
+    this.icon,
+  }) : super(key: key);
+
+  final Function onTap;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 50.0,
+      padding: EdgeInsets.all(10.0),
+      child: InkWell(
+        onTap: onTap,
+        child: Icon(
+          icon,
+          color: kIconColor,
+          size: 18,
         ),
       ),
     );

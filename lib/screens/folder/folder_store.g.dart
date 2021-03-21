@@ -149,6 +149,13 @@ mixin _$FolderStore on _FolderStore, Store {
     return _$_getThumbnailAsyncAction.run(() => super._getThumbnail(f));
   }
 
+  final _$createFolderAsyncAction = AsyncAction('_FolderStore.createFolder');
+
+  @override
+  Future<bool> createFolder(String folderName) {
+    return _$createFolderAsyncAction.run(() => super.createFolder(folderName));
+  }
+
   final _$_FolderStoreActionController = ActionController(name: '_FolderStore');
 
   @override

@@ -63,7 +63,7 @@ class _DrivePanel extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(kDefaultPadding * .5),
                             child: Icon(
-                              CupertinoIcons.add_circled,
+                              CupertinoIcons.cloud,
                               color: kIconColor,
                               size: 18,
                             ),
@@ -81,9 +81,7 @@ class _DrivePanel extends StatelessWidget {
                     ),
                   )),
               SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 1.5 * kDefaultPadding,
-                ),
+                child: SizedBox(height: 1.5 * kDefaultPadding),
               ),
               Observer(
                 builder: (_) => DrivesPanel(

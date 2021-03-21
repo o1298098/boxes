@@ -55,8 +55,9 @@ class GoogleDriveApi extends DriveBaseApi {
         _data = _result.result;
       _newToken = _data['access_token'];
       if (_newToken != null) {
-        final _dropboxIndex =
-            store.appUser.userDrives.indexOf(_userGoogleDrive);
+        final _dropboxIndex = store.appUser.userDrives
+            .indexWhere((e) => e.id == _userGoogleDrive.id);
+        if (_dropboxIndex == -1) return null;
         final _user = store.appUser.copyWith();
         _user.userDrives[_dropboxIndex].accessToken = _newToken;
         store.setAppUser(value: _user);
@@ -119,6 +120,7 @@ class GoogleDriveApi extends DriveBaseApi {
       String orderBy,
       String pageSize,
       String corpora}) async {
+    _userGoogleDrive = googleDrive;
     String _url = '/files';
     final _headers = {
       'Authorization': 'Bearer ${googleDrive.accessToken}',
@@ -142,6 +144,7 @@ class GoogleDriveApi extends DriveBaseApi {
     DriveFile folder, {
     String fields = '*',
   }) async {
+    _userGoogleDrive = googleDrive;
     String _url = '/files';
     final _headers = {
       'Authorization': 'Bearer ${googleDrive.accessToken}',
@@ -192,6 +195,7 @@ class GoogleDriveApi extends DriveBaseApi {
   }
 
   Future createUpload(UserDrive googleDrive, FileUpload file) async {
+    _userGoogleDrive = googleDrive;
     final String _url =
         'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable';
 
@@ -215,6 +219,7 @@ class GoogleDriveApi extends DriveBaseApi {
 
   @override
   Future appendUpload(UserDrive googleDrive, FileUpload file) async {
+    _userGoogleDrive = googleDrive;
     final String _url =
         'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&upload_id=${file.sessionId}';
     final _data = file.uploadContent;
@@ -235,6 +240,7 @@ class GoogleDriveApi extends DriveBaseApi {
   @override
   Future<ResponseModel> finshUpload(
       UserDrive googleDrive, FileUpload file) async {
+    _userGoogleDrive = googleDrive;
     final String _url =
         'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&upload_id=${file.sessionId}';
     final _data = file.uploadContent;
@@ -250,5 +256,55 @@ class GoogleDriveApi extends DriveBaseApi {
         data: Stream.fromIterable(_data.map((e) => [e])));
 
     return _result;
+  }
+
+  @override
+  Future<DriveFile> createFolder(
+      UserDrive googleDrive, FileUpload folder) async {
+    _userGoogleDrive = googleDrive;
+    DriveFile _folder;
+    final _url = '/files';
+    final _headers = {
+      'Authorization': 'Bearer ${googleDrive.accessToken}',
+    };
+    final Map<String, dynamic> _data = {
+      'name': folder.name,
+      'mimeType': 'application/vnd.google-apps.folder'
+    };
+    if (folder.folderId != null)
+      _data.addAll({
+        "parents": [folder.folderId]
+      });
+    final _result = await _http.request(_url,
+        method: "POST", headers: _headers, data: _data);
+    if (_result.success) {
+      final _e = _result.result;
+      _folder = DriveFile(
+        fileId: _e['id'],
+        name: _e['name'],
+        filePath: '',
+        type: 'folder',
+        modifiedDate: DateTime.now(),
+        size: 0,
+        isDownloadable: false,
+        fileExtension: '',
+        driveType: DriveTypeEnum.googleDrive,
+        driveId: googleDrive.id,
+        parentId: folder.folderId,
+      );
+    }
+    return _folder;
+  }
+
+  @override
+  Future<bool> deleteFile(UserDrive googleDrive, DriveFile file) async {
+    _userGoogleDrive = googleDrive;
+    final _url = '/files/${file.fileId}';
+    final _headers = {
+      'Authorization': 'Bearer ${googleDrive.accessToken}',
+    };
+    final _result =
+        await _http.request(_url, method: "DELETE", headers: _headers);
+    return _result.success;
   }
 }
