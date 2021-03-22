@@ -282,22 +282,28 @@ abstract class _FolderStore with Store {
   }
 
   void onUploadFile() async {
-    final _files = await FilePickerCross.importFromStorage();
-    final _file = _files.toUint8List().buffer;
-    final _pathStr = path.skip(1).map((e) => e.name).join('/');
-    FileUpload _fileUpload = FileUpload(
-        uploadId: Uuid().v1(),
-        driveId: drive.id,
-        name: _files.fileName,
-        folderId: _currectFolderId,
-        folderPath: '/${_pathStr.isEmpty ? '' : _pathStr + '/'}',
-        filePath: _files.path,
-        uploadDate: DateTime.now(),
-        fileSize: _files.length,
-        stepIndex: 0,
-        status: UploadStatus.waiting,
-        data: _file);
-    uploadService.uploadFile(drive, _fileUpload);
+    try {
+      final _files = await FilePickerCross.importMultipleFromStorage();
+      for (var _item in _files) {
+        final _file = _item.toUint8List().buffer;
+        final _pathStr = path.skip(1).map((e) => e.name).join('/');
+        FileUpload _fileUpload = FileUpload(
+            uploadId: Uuid().v1(),
+            driveId: drive.id,
+            name: _item.fileName,
+            folderId: _currectFolderId,
+            folderPath: '/${_pathStr.isEmpty ? '' : _pathStr + '/'}',
+            filePath: _item.path,
+            uploadDate: DateTime.now(),
+            fileSize: _item.length,
+            stepIndex: 0,
+            status: UploadStatus.waiting,
+            data: _file);
+        uploadService.uploadFile(drive, _fileUpload);
+      }
+    } on FileSelectionCanceledError catch (_) {
+      print('Cancel by user');
+    }
   }
 
   void _updatePath({Item folder}) {
@@ -348,6 +354,7 @@ abstract class _FolderStore with Store {
     if (_isRoot) await loadFolder(_rootFolder);
     final _folder = _fileIndex.firstWhere((e) => e.fileId == _currectFolderId,
         orElse: () => null);
+    _folder.firstLoading = true;
     if (_folder != null) await loadFolder(_folder);
   }
 

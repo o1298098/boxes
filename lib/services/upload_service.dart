@@ -16,7 +16,8 @@ abstract class _UploadService with Store {
   @observable
   ObservableList<FileUpload> queue = ObservableList<FileUpload>();
   final DatabaseService _db = DatabaseService();
-  final int _uploadSize = 256 * 1024;
+  final int _smallUploadSize = 256 * 1024;
+  final int _largeUploadSize = 2048 * 1024;
   final List<UserDrive> _drives = [];
 
   Function(FileUpload file) callbackWhenUploadFinsh;
@@ -33,6 +34,7 @@ abstract class _UploadService with Store {
   ///
   ///this function will creata resumable upload, one upload session will keep alive for 7 days
   uploadFile(UserDrive drive, FileUpload file) async {
+    final _uploadSize = _getUploadSize(file.fileSize);
     final _newfile = file.copyWith(uploadSize: _uploadSize);
     await _updateQueue(_newfile);
     _createUpdateSession(drive, _newfile);
@@ -42,6 +44,7 @@ abstract class _UploadService with Store {
   start(String uploadId) async {
     final FileUpload _file = _getUploadFile(uploadId);
     if (_file == null) return;
+    assert(_file.status == UploadStatus.uploading);
     final _drive = await _getUserDrive(_file.driveId);
     if (_drive == null) return;
     if (_file.data == null) {
@@ -54,7 +57,7 @@ abstract class _UploadService with Store {
       _createUpdateSession(_drive, _file);
     else {
       _file.status = UploadStatus.uploading;
-      _file.uploadSize = _uploadSize;
+      _file.uploadSize = _getUploadSize(_file.fileSize);
       await _updateQueue(_file);
       final _api = DriveApiFactory.getInstance(_drive.driveType.id);
       _uploading(_drive, _file, _api);
@@ -93,10 +96,10 @@ abstract class _UploadService with Store {
 
   _uploading(UserDrive drive, FileUpload file, DriveBaseApi api) async {
     if (file.status != UploadStatus.uploading) return;
-    int _lenght = file.fileSize - file.stepIndex > _uploadSize
-        ? _uploadSize
+    int _lenght = file.fileSize - file.stepIndex > file.uploadSize
+        ? file.uploadSize
         : file.fileSize - file.stepIndex;
-    if (_lenght == _uploadSize) {
+    if (_lenght == file.uploadSize) {
       final _success = await api.appendUpload(drive, file);
       if (!_success) {
         //print('retry offset:${file.stepIndex}');
@@ -151,5 +154,9 @@ abstract class _UploadService with Store {
       }
     }
     return _drive;
+  }
+
+  _getUploadSize(int fileSize) {
+    return fileSize > 5120 * 1024 ? _largeUploadSize : _smallUploadSize;
   }
 }

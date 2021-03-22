@@ -1,7 +1,7 @@
 enum UploadStatus {
+  waiting,
   uploading,
   stop,
   finsh,
-  waiting,
   error,
 }

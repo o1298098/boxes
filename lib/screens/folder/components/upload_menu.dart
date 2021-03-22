@@ -1,4 +1,5 @@
 import 'package:boxes/components/file_type_icon.dart';
+import 'package:boxes/models/enums/upload_status.dart';
 import 'package:boxes/models/file_upload.dart';
 import 'package:boxes/services/upload_service.dart';
 import 'package:boxes/style/colors.dart';
@@ -87,10 +88,9 @@ class _Menu extends StatelessWidget {
               _UploadPanel(onTap: onUpload),
               SizedBox(height: kDefaultPadding * 1.2),
               Consumer<UploadService>(
-                builder: (context, uploadService, _) => Observer(
-                  builder: (_) => _UploadList(
-                    queue: uploadService.queue,
-                  ),
+                builder: (context, uploadService, _) => _UploadList(
+                  queue: uploadService.queue,
+                  onCancel: (d) => uploadService.delete(d.uploadId),
                 ),
               )
             ],
@@ -105,21 +105,28 @@ class _UploadList extends StatelessWidget {
   const _UploadList({
     Key key,
     this.queue,
+    this.onCancel,
   }) : super(key: key);
   final ObservableList<FileUpload> queue;
+  final Function(FileUpload) onCancel;
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: ListView.separated(
-        itemBuilder: (_, index) {
-          final _d = queue[index];
-          return _UploadItem(d: _d);
-        },
-        separatorBuilder: (_, index) => Divider(
-          color: kLineColor,
-          height: kDefaultPadding * 1.2,
+      child: Observer(
+        builder: (_) => ListView.separated(
+          itemBuilder: (_, index) {
+            final _d = queue[index];
+            return _UploadItem(
+              d: _d,
+              onCancel: onCancel,
+            );
+          },
+          separatorBuilder: (_, index) => Divider(
+            color: kLineColor,
+            height: kDefaultPadding * 1.2,
+          ),
+          itemCount: queue.length,
         ),
-        itemCount: queue.length,
       ),
     );
   }
@@ -129,10 +136,12 @@ class _UploadItem extends StatelessWidget {
   const _UploadItem({
     Key key,
     @required FileUpload d,
+    this.onCancel,
   })  : _d = d,
         super(key: key);
 
   final FileUpload _d;
+  final Function(FileUpload) onCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -162,11 +171,20 @@ class _UploadItem extends StatelessWidget {
               total: _d.fileSize,
             ),
             SizedBox(width: kDefaultPadding * .5),
-            Icon(
-              Icons.close,
-              size: 12,
-              color: kGrayColor,
-            )
+            _d.status == UploadStatus.finsh
+                ? Icon(
+                    Icons.done_rounded,
+                    size: 12,
+                    color: kGrayColor,
+                  )
+                : InkWell(
+                    onTap: () => onCancel(_d),
+                    child: Icon(
+                      Icons.close,
+                      size: 12,
+                      color: kGrayColor,
+                    ),
+                  )
           ],
         ),
       ),
