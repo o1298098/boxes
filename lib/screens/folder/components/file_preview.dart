@@ -134,7 +134,11 @@ class _VideoPlayer extends StatelessWidget {
                   appBar: AppBar(),
                   body: AppVideoPlayer(
                     controller: VideoPlayerController.network(
-                        store.selectedFile.downloadLink),
+                      store.selectedFile.downloadLink,
+                      httpHeaders: {
+                        "Authorization": "Bearer ${store.drive.accessToken}}",
+                      },
+                    ),
                   ),
                 );
               },
@@ -144,7 +148,7 @@ class _VideoPlayer extends StatelessWidget {
       );
     }
 
-    return store.selectedFile.downloadLink != null && store.selectedFile.isVideo
+    return store.selectedFile.downloadLink != null && store.selectedFile.isMedia
         ? PlayArrow(
             onTap: () async => _onTap(),
           )

@@ -11,10 +11,10 @@ class Calcuation {
     return '$size';
   }
 
-  static final _videoType = ['mp4', 'mkv', 'mov', 'webm'];
+  static final _mediaType = ['mp4', 'mkv', 'mov', 'webm', 'mp3', 'flac'];
 
-  static bool isVideo(String fileExtension) {
-    return _videoType.contains(fileExtension);
+  static bool isMedia(String fileExtension) {
+    return _mediaType.contains(fileExtension);
   }
 
   static String formatDuration(Duration d) {

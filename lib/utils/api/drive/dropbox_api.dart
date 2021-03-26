@@ -321,11 +321,11 @@ class DropboxApi extends DriveBaseApi {
         method: "POST", headers: _headers, data: _data);
     Map<String, dynamic> _metadata;
     if (_result.success) {
-      final _d = _result.result.mediaInfo.metadata;
+      final _d = _result.result.mediaInfo?.metadata;
       _metadata = {
-        "width": _d.dimensions.width,
-        "height": _d.dimensions.height,
-        "durationMillis": _d.duration.toString()
+        "width": _d?.dimensions?.width,
+        "height": _d?.dimensions?.height,
+        "durationMillis": _d?.duration?.toString() ?? '0'
       };
     }
     return _metadata;

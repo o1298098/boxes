@@ -1,6 +1,7 @@
 import 'package:boxes/screens/folder/folder_store.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'file_item.dart';
@@ -27,11 +28,13 @@ class FileGrid extends StatelessWidget {
             delegate: SliverChildBuilderDelegate(
               (_, index) {
                 final _d = store.files[index];
-                return FileItem(
-                  key: ValueKey(_d.fileId),
-                  file: _d,
-                  token: store.drive.accessToken,
-                  onTap: store.fileTap,
+                return Observer(
+                  builder: (_) => FileItem(
+                    key: ValueKey(_d.fileId),
+                    file: _d,
+                    token: store.drive.accessToken,
+                    onTap: store.fileTap,
+                  ),
                 );
               },
               childCount: store.files?.length ?? 0,
@@ -61,6 +64,7 @@ class _FileGridShimmer extends StatelessWidget {
             baseColor: kBgDarkColor,
             highlightColor: kBgLightColor,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(

@@ -1,53 +1,50 @@
 import 'dart:convert' show base64, json;
+import 'package:boxes/services/drive_file_store.dart';
 import 'package:boxes/utils/calculation.dart';
-import 'package:mobx/mobx.dart';
 
 import 'enums/dirve_type_enum.dart';
 
-class DriveFile {
-  DriveFile(
-      {this.fileId,
-      this.name,
-      this.fileExtension,
-      this.filePath,
-      this.isDownloadable = false,
-      this.mediaMetaData,
-      this.mimeType,
-      this.size,
-      this.type,
-      this.modifiedDate,
-      this.thumbnailLink,
-      this.downloadLink,
-      this.driveType,
-      this.driveId,
-      this.parentId});
-  final int driveId;
-  final String fileId;
-  final String name;
-  final String mimeType;
-  final int size;
-  Map<String, dynamic> mediaMetaData;
-  final String fileExtension;
-  final String type;
-  final bool isDownloadable;
-  String downloadLink;
-  final String filePath;
-  @observable
-  dynamic thumbnailLink;
-  final DateTime modifiedDate;
-  final String parentId;
-  final DriveTypeEnum driveType;
-  String nextPageToken;
-  bool hasMoreFiles = true;
-  bool firstLoading = true;
-
+class DriveFile extends DriveFileStore {
+  DriveFile({
+    int driveId,
+    String fileId,
+    String name,
+    String mimeType,
+    int size,
+    Map<String, dynamic> mediaMetaData,
+    String fileExtension,
+    String type,
+    bool isDownloadable,
+    String downloadLink,
+    String filePath,
+    dynamic thumbnailLink,
+    DateTime modifiedDate,
+    String parentId,
+    DriveTypeEnum driveType,
+  }) : super(
+          driveId: driveId,
+          fileId: fileId,
+          name: name,
+          mimeType: mimeType,
+          size: size,
+          mediaMetaData: mediaMetaData,
+          fileExtension: fileExtension,
+          type: type,
+          isDownloadable: isDownloadable,
+          downloadLink: downloadLink,
+          filePath: filePath,
+          thumbnailLink: thumbnailLink,
+          modifiedDate: modifiedDate,
+          parentId: parentId,
+          driveType: driveType,
+        );
   get dropboxThumbnail =>
       this.thumbnailLink == null ? null : base64.decode(this.thumbnailLink);
 
-  get isVideo => Calcuation.isVideo(this.fileExtension);
+  get isMedia => Calcuation.isMedia(this.fileExtension);
 
   get mediaDuration {
-    final String _durationStr = this.mediaMetaData != null && this.isVideo
+    final String _durationStr = this.mediaMetaData != null && this.isMedia
         ? this.mediaMetaData["durationMillis"]
         : null;
     final int _videoDuration =

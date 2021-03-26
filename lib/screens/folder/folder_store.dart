@@ -27,6 +27,8 @@ abstract class _FolderStore with Store {
 
   UploadService uploadService;
 
+  final _uuid = Uuid();
+
   final List<DriveFile> _fileIndex = [];
 
   final DatabaseService _db = DatabaseService();
@@ -187,7 +189,7 @@ abstract class _FolderStore with Store {
     previewShow();
     if (selectedFile == file) return;
     selectedFile = file;
-    if (selectedFile.isVideo && selectedFile.mediaMetaData == null) {
+    if (selectedFile.isMedia && selectedFile.mediaMetaData == null) {
       final _result = await _api.getFileMetadata(drive, selectedFile.fileId);
       if (_result is Map) {
         if (file.fileId != selectedFile.fileId) return;
@@ -196,7 +198,7 @@ abstract class _FolderStore with Store {
         await _db.insertFile(selectedFile);
       }
     }
-    if (selectedFile.isVideo && selectedFile.downloadLink == null) {
+    if (selectedFile.isMedia && selectedFile.downloadLink == null) {
       final _api =
           DriveApiFactory.getInstance(selectedFile.driveType.index + 1);
       final ResponseModel _result =
@@ -288,7 +290,7 @@ abstract class _FolderStore with Store {
         final _file = _item.toUint8List().buffer;
         final _pathStr = path.skip(1).map((e) => e.name).join('/');
         FileUpload _fileUpload = FileUpload(
-            uploadId: Uuid().v1(),
+            uploadId: _uuid.v1(),
             driveId: drive.id,
             name: _item.fileName,
             folderId: _currectFolderId,

@@ -226,7 +226,11 @@ class _UploadPanel extends StatelessWidget {
                   TextSpan(
                       text: 'Drag and drop',
                       style: TextStyle(color: kPrimaryColor)),
-                  TextSpan(text: ' or browse files')
+                  TextSpan(
+                      text: ' or browse files',
+                      style: TextStyle(
+                        color: const Color(0xFFFFFFFF),
+                      ))
                 ],
               ),
             )
