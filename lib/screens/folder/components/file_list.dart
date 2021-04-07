@@ -56,6 +56,7 @@ class _FileListItem extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return InkWell(
       onTap: () async => await onTap(file),
       child: Observer(
@@ -63,7 +64,9 @@ class _FileListItem extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8.0),
           padding: const EdgeInsets.all(kDefaultPadding * .8),
           decoration: BoxDecoration(
-            color: store.selectedFile == file ? kLineColor : kBgLightColor,
+            color: store.selectedFile == file
+                ? _theme.colorScheme.surface
+                : _theme.cardColor,
             borderRadius: BorderRadius.circular(8.0),
           ),
           child: Row(
@@ -71,7 +74,7 @@ class _FileListItem extends StatelessWidget {
               isFolder
                   ? Icon(
                       FontAwesomeIcons.solidFolder,
-                      color: kGrayColor,
+                      color: _theme.colorScheme.primary,
                     )
                   : SizedBox(
                       width: 30,
@@ -89,7 +92,8 @@ class _FileListItem extends StatelessWidget {
                     file.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: kIconColor, fontSize: 12),
+                    style: TextStyle(
+                        color: _theme.colorScheme.primary, fontSize: 12),
                   ),
                 ),
               ),
@@ -97,18 +101,19 @@ class _FileListItem extends StatelessWidget {
                 isFolder
                     ? '${store.fileCount(file.fileId)} files'
                     : DateFormat.yMMMd().format(file.modifiedDate).toString(),
-                style: TextStyle(color: kIconColor, fontSize: 12),
+                style:
+                    TextStyle(color: _theme.colorScheme.primary, fontSize: 12),
               ),
               SizedBox(width: kDefaultPadding),
               Icon(
                 FontAwesomeIcons.star,
-                color: kIconColor,
+                color: _theme.colorScheme.primary,
                 size: 14,
               ),
               SizedBox(width: kDefaultPadding * .5),
               Icon(
                 Icons.more_vert_rounded,
-                color: kIconColor,
+                color: _theme.colorScheme.primary,
                 size: 18,
               ),
             ],
@@ -137,21 +142,22 @@ class _ShimmerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 8.0),
       padding: const EdgeInsets.all(kDefaultPadding * .8),
       decoration: BoxDecoration(
-        color: kBgLightColor,
+        color: _theme.cardColor,
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Shimmer.fromColors(
-        baseColor: kBgDarkColor,
-        highlightColor: kBgLightColor,
+        baseColor: _theme.backgroundColor,
+        highlightColor: _theme.cardColor,
         child: Row(
           children: [
             Container(
               decoration: BoxDecoration(
-                color: kBgDarkColor,
+                color: _theme.backgroundColor,
                 borderRadius: BorderRadius.circular(4.0),
               ),
               width: 30,
@@ -159,7 +165,7 @@ class _ShimmerItem extends StatelessWidget {
             ),
             SizedBox(width: kDefaultPadding * .8),
             Container(
-              color: kBgDarkColor,
+              color: _theme.backgroundColor,
               width: 300,
               height: 16,
             )

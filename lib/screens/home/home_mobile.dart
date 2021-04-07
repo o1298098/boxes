@@ -9,11 +9,11 @@ class HomeMobileScreen extends StatefulWidget {
 class _HomeMobileScreenState extends State<HomeMobileScreen>
     with SingleTickerProviderStateMixin {
   Tween<Offset> _slideAnimation =
-      Tween<Offset>(begin: Offset.zero, end: Offset(.9, 0.0));
-  Tween<double> _scaleAnimation = Tween<double>(begin: 1.0, end: .9);
+      Tween<Offset>(begin: Offset.zero, end: Offset(.9, .1));
+  Tween<double> _scaleAnimation = Tween<double>(begin: 1.0, end: .8);
   Tween<Offset> _slideAnimation2 =
-      Tween<Offset>(begin: Offset.zero, end: Offset(.85, 0.0));
-  Tween<double> _scaleAnimation2 = Tween<double>(begin: 1.0, end: .8);
+      Tween<Offset>(begin: Offset.zero, end: Offset(.85, .1));
+  Tween<double> _scaleAnimation2 = Tween<double>(begin: 1.0, end: .7);
   AnimationController _controller;
   @override
   void initState() {

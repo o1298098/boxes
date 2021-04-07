@@ -16,8 +16,9 @@ class FilePreview extends StatelessWidget {
   const FilePreview({Key key, this.store, this.onClose}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Container(
-      color: kMenuBackgroundColor,
+      color: _theme.cardColor,
       width: 300,
       child: SafeArea(
         child: Padding(
@@ -34,14 +35,13 @@ class FilePreview extends StatelessWidget {
                             children: [
                               Icon(
                                 FontAwesomeIcons.fileAlt,
-                                color: kIconColor,
+                                color: _theme.colorScheme.primary,
                                 size: 12,
                               ),
                               SizedBox(width: 8.0),
                               Text(
                                 'File Preview',
                                 style: TextStyle(
-                                  color: Color(0xFFFFFFFF),
                                   fontSize: 12,
                                 ),
                               ),
@@ -53,14 +53,14 @@ class FilePreview extends StatelessWidget {
                                   child: Icon(
                                     Icons.close,
                                     size: 16,
-                                    color: Color(0xFFFFFFFF),
+                                    color: _theme.colorScheme.onPrimary,
                                   ),
                                 ),
                               )
                             ],
                           ),
                           Divider(
-                            color: kLineColor,
+                            color: _theme.colorScheme.surface,
                             thickness: 1.5,
                           ),
                           SizedBox(height: kDefaultPadding * .8),
@@ -80,14 +80,13 @@ class FilePreview extends StatelessWidget {
                           ),
                           SizedBox(height: kDefaultPadding * .8),
                           Divider(
-                            color: kLineColor,
+                            color: _theme.colorScheme.surface,
                             thickness: 1.5,
                           ),
                           SizedBox(height: kDefaultPadding * .5),
                           Text(
                             store.selectedFile?.name ?? '',
                             style: TextStyle(
-                              color: const Color(0xFFFFFFFF),
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                               height: 1.5,

@@ -1,6 +1,6 @@
 import 'package:boxes/models/user_drive.dart';
 import 'package:boxes/responsive.dart';
-import 'package:boxes/screens/home/components/sliverappbar_delegate.dart';
+import 'package:boxes/components/sliverappbar_delegate.dart';
 import 'package:boxes/services/settings_store.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:flutter/material.dart';
@@ -16,11 +16,10 @@ class Menu extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final _mediaQuery = MediaQuery.of(context);
-    final _dark = _mediaQuery.platformBrightness == Brightness.dark;
+    final _theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-          color: _dark ? kBgDarkColor : Color(0xFFE0E0E0E0),
+          color: _theme.backgroundColor,
           border: Border(
             right: BorderSide(
               color: kLineColor.withAlpha(20),
@@ -77,8 +76,7 @@ class _CustomAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _mediaQuery = MediaQuery.of(context);
-    final _dark = _mediaQuery.platformBrightness == Brightness.dark;
+    final _theme = Theme.of(context);
     return SliverPersistentHeader(
       pinned: true,
       delegate: SliverAppBarDelegate(
@@ -86,7 +84,7 @@ class _CustomAppBar extends StatelessWidget {
         maxHeight: 60,
         child: Container(
           padding: EdgeInsets.all(kDefaultPadding),
-          color: _dark ? kBgLightColor : Colors.white,
+          color: _theme.cardColor,
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -121,12 +119,11 @@ class AddServiceItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _mediaQuery = MediaQuery.of(context);
-    final _dark = _mediaQuery.platformBrightness == Brightness.dark;
+    final _theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
       child: Container(
-        color: _dark ? kBgLightColor : Color(0xFFFFFFFF),
+        color: _theme.cardColor,
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8.0),
         child: Row(
           children: [
@@ -156,13 +153,12 @@ class _DriveItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _mediaQuery = MediaQuery.of(context);
-    final _dark = _mediaQuery.platformBrightness == Brightness.dark;
+    final _theme = Theme.of(context);
 
     return InkWell(
       onTap: () => onTap(_d),
       child: Container(
-        color: _dark ? kBgLightColor : Color(0xFFFFFFFF),
+        color: _theme.cardColor,
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [

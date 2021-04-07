@@ -46,6 +46,7 @@ class FileGrid extends StatelessWidget {
 class _FileGridShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         mainAxisExtent: 280,
@@ -58,11 +59,11 @@ class _FileGridShimmer extends StatelessWidget {
           padding: EdgeInsets.all(kDefaultPadding),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: kBgLightColor,
+            color: _theme.cardColor,
           ),
           child: Shimmer.fromColors(
-            baseColor: kBgDarkColor,
-            highlightColor: kBgLightColor,
+            baseColor: _theme.backgroundColor,
+            highlightColor: _theme.cardColor,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,25 +72,25 @@ class _FileGridShimmer extends StatelessWidget {
                   constraints: BoxConstraints(maxHeight: 140),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: kBgLightColor,
+                    color: _theme.cardColor,
                   ),
                 ),
                 SizedBox(height: 20),
                 Container(
                   height: 14,
-                  color: kBgDarkColor,
+                  color: _theme.backgroundColor,
                 ),
                 Spacer(),
                 Container(
                   width: 60,
                   height: 10,
-                  color: kBgDarkColor,
+                  color: _theme.backgroundColor,
                 ),
                 SizedBox(height: 8.0),
                 Container(
                   width: 40,
                   height: 10,
-                  color: kBgDarkColor,
+                  color: _theme.backgroundColor,
                 ),
               ],
             ),

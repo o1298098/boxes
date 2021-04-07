@@ -113,15 +113,15 @@ abstract class _UploadService with Store {
         await _uploading(drive, _file, api);
       }
     } else
-      await _finshUpload(drive, file, api);
+      await _finishUpload(drive, file, api);
   }
 
-  _finshUpload(UserDrive drive, FileUpload file, DriveBaseApi api) async {
+  _finishUpload(UserDrive drive, FileUpload file, DriveBaseApi api) async {
     if (file.status != UploadStatus.uploading) return;
     final _result = await api.finshUpload(drive, file);
     if (_result.success) {
       file.stepIndex = file.fileSize;
-      file.status = UploadStatus.finsh;
+      file.status = UploadStatus.finish;
       await _updateQueue(file);
       if (callbackWhenUploadFinsh != null) callbackWhenUploadFinsh(file);
       print(_result.result);

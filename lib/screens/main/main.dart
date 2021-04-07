@@ -2,7 +2,7 @@ import 'package:boxes/components/keepalive_widget.dart';
 import 'package:boxes/components/side_menu.dart';
 import 'package:boxes/responsive.dart';
 import 'package:boxes/screens/home/home.dart';
-import 'package:boxes/screens/home/home_mobile.dart';
+import 'package:boxes/screens/home/home_store.dart';
 import 'package:boxes/screens/main/main_store.dart';
 import 'package:boxes/screens/test/test.dart';
 import 'package:boxes/style/colors.dart';
@@ -17,50 +17,55 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final MainStore _store = MainStore();
+  final HomeStore _homeStore = HomeStore();
   PageController _pageController;
-  final _pages = [
-    keepAliveWrapper(HomeScreen()),
-    Container(
-      height: double.infinity,
-      alignment: Alignment.center,
-      color: kBgDarkColor,
-      child: Text(
-        '1',
-        style: TextStyle(color: Color(0xFFFFFFFF)),
-      ),
-    ),
-    Container(
-      height: double.infinity,
-      alignment: Alignment.center,
-      color: kBgDarkColor,
-      child: Text(
-        '2',
-        style: TextStyle(color: Color(0xFFFFFFFF)),
-      ),
-    ),
-    Container(
-      height: double.infinity,
-      alignment: Alignment.center,
-      color: kBgDarkColor,
-      child: Text(
-        '3',
-        style: TextStyle(color: Color(0xFFFFFFFF)),
-      ),
-    ),
-    Container(
-      height: double.infinity,
-      alignment: Alignment.center,
-      color: kBgDarkColor,
-      child: Text(
-        '4',
-        style: TextStyle(color: Color(0xFFFFFFFF)),
-      ),
-    ),
-    keepAliveWrapper(TestScreen()),
-  ];
-
+  List<Widget> _pages;
+  Widget _homePage;
   @override
   void initState() {
+    _homePage = keepAliveWrapper(HomeScreen(
+      store: _homeStore,
+    ));
+    _pages = [
+      _homePage,
+      Container(
+        height: double.infinity,
+        alignment: Alignment.center,
+        color: kBgDarkColor,
+        child: Text(
+          '1',
+          style: TextStyle(color: Color(0xFFFFFFFF)),
+        ),
+      ),
+      Container(
+        height: double.infinity,
+        alignment: Alignment.center,
+        color: kBgDarkColor,
+        child: Text(
+          '2',
+          style: TextStyle(color: Color(0xFFFFFFFF)),
+        ),
+      ),
+      Container(
+        height: double.infinity,
+        alignment: Alignment.center,
+        color: kBgDarkColor,
+        child: Text(
+          '3',
+          style: TextStyle(color: Color(0xFFFFFFFF)),
+        ),
+      ),
+      Container(
+        height: double.infinity,
+        alignment: Alignment.center,
+        color: kBgDarkColor,
+        child: Text(
+          '4',
+          style: TextStyle(color: Color(0xFFFFFFFF)),
+        ),
+      ),
+      keepAliveWrapper(TestScreen()),
+    ];
     _pageController = PageController();
     super.initState();
   }
@@ -118,7 +123,7 @@ class _MainScreenState extends State<MainScreen> {
               ],
             ),
           ),
-          mobile: HomeMobileScreen(),
+          mobile: _homePage,
         ),
       ),
     );

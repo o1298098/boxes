@@ -46,8 +46,9 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return SimpleDialog(
-      backgroundColor: kBgLightColor,
+      backgroundColor: _theme.cardColor,
       titleTextStyle: TextStyle(fontSize: 16),
       title: const Text('Create Folder'),
       contentPadding: EdgeInsets.all(kDefaultPadding),
@@ -68,7 +69,8 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
             child: _loading
                 ? const _LoadingWidget()
                 : ElevatedButton(
-                    style: ElevatedButton.styleFrom(primary: kPrimaryColor),
+                    style:
+                        ElevatedButton.styleFrom(primary: _theme.primaryColor),
                     onPressed: () => _submit(),
                     child: const Text('ok'),
                   ),
@@ -95,11 +97,12 @@ class _InputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Container(
       height: 30,
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       decoration: BoxDecoration(
-        color: kBgDarkColor,
+        color: _theme.backgroundColor,
         borderRadius: BorderRadius.circular(4.0),
       ),
       child: Center(
@@ -109,7 +112,7 @@ class _InputField extends StatelessWidget {
           style: TextStyle(color: Color(0xFFFFFFFF), fontSize: 14.0),
           enableSuggestions: false,
           autofocus: true,
-          cursorColor: kPrimaryColor,
+          cursorColor: _theme.primaryColor,
           scrollPadding: EdgeInsets.zero,
           decoration: InputDecoration(
             hintText: 'new folder',
@@ -133,6 +136,7 @@ class _LoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Padding(
       padding: EdgeInsets.all(6.0),
       child: Center(
@@ -141,7 +145,7 @@ class _LoadingWidget extends StatelessWidget {
             height: 16.0,
             child: CircularProgressIndicator(
               strokeWidth: 4.0,
-              valueColor: AlwaysStoppedAnimation(kPrimaryColor),
+              valueColor: AlwaysStoppedAnimation(_theme.primaryColor),
             )),
       ),
     );

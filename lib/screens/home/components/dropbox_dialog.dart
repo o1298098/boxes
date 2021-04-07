@@ -24,6 +24,7 @@ class _DropboxDialogState extends State<DropboxDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Container(
       padding: EdgeInsets.all(kDefaultPadding),
       width: 300,
@@ -41,7 +42,8 @@ class _DropboxDialogState extends State<DropboxDialog> {
             height: 30,
             padding: EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
-                color: kBgDarkColor, borderRadius: BorderRadius.circular(4)),
+                color: _theme.backgroundColor,
+                borderRadius: BorderRadius.circular(4)),
             child: Center(
               child: TextField(
                 style: TextStyle(

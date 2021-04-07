@@ -1,12 +1,13 @@
 import 'package:boxes/components/custom_app_bar.dart';
 import 'package:boxes/components/overlay_entry_manage.dart';
 import 'package:boxes/models/models.dart';
+import 'package:boxes/responsive.dart';
 import 'package:boxes/screens/folder/components/create_folder_dialog.dart';
 import 'package:boxes/screens/folder/components/file_preview.dart';
 import 'package:boxes/screens/folder/components/folder_path.dart';
 import 'package:boxes/screens/folder/components/upload_menu.dart';
 import 'package:boxes/screens/folder/folder_store.dart';
-import 'package:boxes/screens/home/components/sliverappbar_delegate.dart';
+import 'package:boxes/components/sliverappbar_delegate.dart';
 import 'package:boxes/services/upload_service.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -94,8 +95,9 @@ class _FolderScreenState extends State<FolderScreen>
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Container(
-      color: kBgDarkColor,
+      color: _theme.backgroundColor,
       child: Stack(children: [
         Row(
           children: [
@@ -179,11 +181,15 @@ class _Folder extends StatelessWidget {
       ];
     }
 
+    final double _padding =
+        Responsive.isDesktop(context) ? kDefaultPadding * 2.5 : kDefaultPadding;
+
     return SafeArea(
+      left: false,
+      right: false,
       child: Scrollbar(
         child: Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 2.5 * kDefaultPadding),
+          padding: EdgeInsets.symmetric(horizontal: _padding),
           child: Observer(
             builder: (_) => CustomScrollView(
               controller: controller,
@@ -255,6 +261,7 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Container(
       width: 50.0,
       padding: EdgeInsets.all(10.0),
@@ -262,7 +269,7 @@ class _ActionButton extends StatelessWidget {
         onTap: onTap,
         child: Icon(
           icon,
-          color: kIconColor,
+          color: _theme.colorScheme.primary,
           size: 18,
         ),
       ),

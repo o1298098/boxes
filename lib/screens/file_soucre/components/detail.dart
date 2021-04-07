@@ -4,7 +4,7 @@ import 'package:boxes/components/loading_layout.dart';
 import 'package:boxes/models/models.dart';
 import 'package:boxes/responsive.dart';
 import 'package:boxes/screens/file_soucre/file_source_store.dart';
-import 'package:boxes/screens/home/components/sliverappbar_delegate.dart';
+import 'package:boxes/components/sliverappbar_delegate.dart';
 import 'package:boxes/services/database_service.dart';
 import 'package:boxes/services/settings_store.dart';
 import 'package:boxes/style/colors.dart';
@@ -171,15 +171,14 @@ class _DetailState extends State<Detail> {
 
   @override
   Widget build(BuildContext context) {
-    final _mediaQuery = MediaQuery.of(context);
-    final _dark = _mediaQuery.platformBrightness == Brightness.dark;
+    final _theme = Theme.of(context);
     return Observer(
       builder: (context) => Stack(
         children: [
           widget.store.selected
               ? Container(
                   height: double.infinity,
-                  color: _dark ? kBgDarkColor : Color(0xFFE0E0E0),
+                  color: _theme.backgroundColor,
                   child: Column(
                     children: [
                       _CustomAppBar(),
@@ -211,7 +210,7 @@ class _DetailState extends State<Detail> {
                     ],
                   ),
                 )
-              : Container(color: _dark ? kBgDarkColor : Color(0xFFE0E0E0)),
+              : Container(color: _theme.backgroundColor),
           LoadingLayout(
             title: 'Loading',
             show: _isLoading,
@@ -238,11 +237,11 @@ class _OperationGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _mediaQuery = MediaQuery.of(context);
-    final _dark = _mediaQuery.platformBrightness == Brightness.dark;
+    final _theme = Theme.of(context);
+    final _dark = _theme.brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-          color: _dark ? kBgLightColor : Color(0xFFFFFFFF),
+          color: _dark ? _theme.cardColor : Color(0xFFFFFFFF),
           border: Border(
             top: BorderSide(
               color: kLineColor.withAlpha(20),
@@ -258,14 +257,14 @@ class _OperationGroup extends StatelessWidget {
         children: [
           _ButtonCell(
             title: 'Add',
-            textColor: kPrimaryColor,
+            textColor: _theme.primaryColor,
             onTap: addTap,
             display: !isEdit,
           ),
           Divider(height: 1.0),
           _ButtonCell(
             title: 'Save',
-            textColor: kPrimaryColor,
+            textColor: _theme.primaryColor,
             display: isEdit,
             onTap: saveTap,
           ),
@@ -305,11 +304,10 @@ class _BaseInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _mediaQuery = MediaQuery.of(context);
-    final _dark = _mediaQuery.platformBrightness == Brightness.dark;
+    final _theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-          color: _dark ? kBgLightColor : Color(0xFFFFFFFF),
+          color: _theme.cardColor,
           border: Border(
             top: BorderSide(
               color: kLineColor.withAlpha(20),
@@ -509,8 +507,7 @@ class _DriveTypeList extends StatelessWidget {
   const _DriveTypeList({Key key, this.onTap}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final _mediaQuery = MediaQuery.of(context);
-    final _dark = _mediaQuery.platformBrightness == Brightness.dark;
+    final _theme = Theme.of(context);
     final _listData = [
       {'id': 1, 'name': 'Google Drive', 'needAccount': false},
       {'id': 2, 'name': 'Dropbox', 'needAccount': false},
@@ -521,7 +518,7 @@ class _DriveTypeList extends StatelessWidget {
       {'id': 7, 'name': 'NFS', 'needAccount': true},
     ];
     return Scaffold(
-      backgroundColor: _dark ? kBgDarkColor : Color(0xFFE0E0E0),
+      backgroundColor: _theme.backgroundColor,
       body: CustomScrollView(
         slivers: [
           SliverPersistentHeader(
@@ -551,7 +548,7 @@ class _DriveTypeList extends StatelessWidget {
                   left: .5 * kDefaultPadding,
                   top: .5 * kDefaultPadding,
                 ),
-                color: _dark ? kBgLightColor : Color(0xFFFFFFFF),
+                color: _theme.cardColor,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -581,13 +578,12 @@ class _CustomAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _mediaQuery = MediaQuery.of(context);
-    final _dark = _mediaQuery.platformBrightness == Brightness.dark;
+    final _theme = Theme.of(context);
     return Container(
       height: 60,
       width: double.infinity,
       padding: EdgeInsets.all(kDefaultPadding),
-      color: _dark ? kBgLightColor : Colors.white,
+      color: _theme.cardColor,
       child: Stack(
         children: [
           Align(

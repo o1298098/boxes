@@ -43,10 +43,13 @@ class _LayoutSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Container(
       padding: EdgeInsets.all(3.0),
       decoration: BoxDecoration(
-        color: kBgLightColor,
+        color: _theme.brightness == Brightness.dark
+            ? _theme.cardColor
+            : const Color(0xFFE7F0F7),
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Row(
@@ -81,19 +84,24 @@ class _LayoutItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
       child: Container(
         decoration: selected
             ? BoxDecoration(
-                color: kLineColor,
+                color: _theme.brightness == Brightness.dark
+                    ? kLineColor
+                    : const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(6.0),
               )
             : null,
         padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
         child: Icon(
           icon,
-          color: selected ? Color(0xFFFFFFFF) : kIconColor,
+          color: selected
+              ? _theme.colorScheme.onPrimary
+              : _theme.colorScheme.primary,
           size: 14,
         ),
       ),
@@ -113,6 +121,7 @@ class _FolderPath extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Expanded(
       child: SizedBox(
         height: 36,
@@ -132,16 +141,18 @@ class _FolderPath extends StatelessWidget {
                 _d.name,
                 style: TextStyle(
                   fontSize: 14,
-                  color: _selected ? Color(0xFFFFFFFF) : kGrayColor,
+                  color: _selected
+                      ? _theme.textTheme.bodyText1.color
+                      : _theme.colorScheme.secondary,
                 ),
               ),
             );
           },
           separatorBuilder: (_, index) => Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: const Icon(
+            child: Icon(
               FontAwesomeIcons.chevronRight,
-              color: kGrayColor,
+              color: _theme.colorScheme.secondary,
               size: 10,
             ),
           ),
@@ -159,17 +170,18 @@ class _PathButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: kBgLightColor,
+        color: _theme.cardColor,
         borderRadius: BorderRadius.circular(kDefaultPadding * .5),
       ),
       child: Row(
         children: [
           Icon(
             FontAwesomeIcons.solidFolder,
-            color: kGrayColor,
+            color: _theme.colorScheme.primary,
             size: 16,
           ),
           SizedBox(width: 10),

@@ -11,6 +11,7 @@ class SideMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     final _mediaQuery = MediaQuery.of(context);
     final _menuHeight = 530 + _mediaQuery.padding.top;
     final _userHeight = _mediaQuery.size.height - _menuHeight > 0
@@ -26,7 +27,7 @@ class SideMenu extends StatelessWidget {
   ];*/
     return Container(
       width: 65 + _mediaQuery.padding.left,
-      color: kMenuBackgroundColor,
+      color: _theme.cardColor,
       child: SafeArea(
         top: true,
         bottom: false,
@@ -40,7 +41,7 @@ class SideMenu extends StatelessWidget {
               children: [
                 Icon(
                   Icons.sports_baseball_rounded,
-                  color: kSelectIconColor,
+                  color: _theme.colorScheme.onPrimary,
                   size: 20,
                 ),
                 SizedBox(height: kDefaultPadding * 1.6),
@@ -130,7 +131,9 @@ class _MenuItem extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    final _color = selected ? kSelectIconColor : kIconColor;
+    final _theme = Theme.of(context);
+    final _color =
+        selected ? _theme.colorScheme.onPrimary : _theme.colorScheme.primary;
     return InkWell(
       onTap: () => onTap(index),
       child: Container(

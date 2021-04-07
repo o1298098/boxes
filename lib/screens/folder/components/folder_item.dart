@@ -12,20 +12,21 @@ class FolderItem extends StatelessWidget {
       {@required this.file, this.token, @required this.onTap, this.count});
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return GestureDetector(
       onTap: () => onTap(file),
       child: Container(
         padding: EdgeInsets.all(kDefaultPadding),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: kBgLightColor,
+          color: _theme.cardColor,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(
               FontAwesomeIcons.solidFolder,
-              color: kGrayColor,
+              color: _theme.colorScheme.primary,
             ),
             Spacer(),
             Text(
@@ -33,7 +34,6 @@ class FolderItem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFFFFFFFF),
               ),
             ),
             SizedBox(height: 6),

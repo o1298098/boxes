@@ -1,4 +1,5 @@
 import 'package:boxes/models/models.dart';
+import 'package:boxes/responsive.dart';
 import 'package:boxes/screens/folder/folder.dart';
 import 'package:boxes/screens/home/components/drives_panel.dart';
 import 'package:boxes/screens/home/home_store.dart';
@@ -10,20 +11,23 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/custom_app_bar.dart';
-import 'components/sliverappbar_delegate.dart';
+import '../../components/sliverappbar_delegate.dart';
 
 class HomeScreen extends StatelessWidget {
-  final _store = HomeStore();
+  final HomeStore store;
+
+  const HomeScreen({Key key, this.store}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: kBgDarkColor,
+      backgroundColor: _theme.backgroundColor,
       body: Observer(
-        builder: (_) => _store.selectDrive == null
-            ? _DrivePanel(onTap: _store.setDrive)
+        builder: (_) => store.selectDrive == null
+            ? _DrivePanel(onTap: store.setDrive)
             : FolderScreen(
-                drive: _store.selectDrive,
-                onPop: () => _store.setDrive(null),
+                drive: store.selectDrive,
+                onPop: () => store.setDrive(null),
               ),
       ),
     );
@@ -38,9 +42,14 @@ class _DrivePanel extends StatelessWidget {
   final Function(UserDrive) onTap;
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
+    final double _padding =
+        Responsive.isDesktop(context) ? kDefaultPadding * 2.5 : kDefaultPadding;
     return SafeArea(
+      left: false,
+      right: false,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2.5 * kDefaultPadding),
+        padding: EdgeInsets.symmetric(horizontal: _padding),
         child: Consumer<SettingsStore>(
           builder: (_, store, __) => CustomScrollView(
             slivers: [
@@ -64,7 +73,7 @@ class _DrivePanel extends StatelessWidget {
                             padding: const EdgeInsets.all(kDefaultPadding * .5),
                             child: Icon(
                               CupertinoIcons.cloud,
-                              color: kIconColor,
+                              color: _theme.colorScheme.primary,
                               size: 18,
                             ),
                           ),
@@ -73,7 +82,7 @@ class _DrivePanel extends StatelessWidget {
                           padding: const EdgeInsets.all(kDefaultPadding * .5),
                           child: Icon(
                             CupertinoIcons.search,
-                            color: kIconColor,
+                            color: _theme.colorScheme.primary,
                             size: 18,
                           ),
                         ),

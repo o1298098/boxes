@@ -1,6 +1,7 @@
 import 'package:boxes/components/file_type_icon.dart';
 import 'package:boxes/models/enums/upload_status.dart';
 import 'package:boxes/models/file_upload.dart';
+import 'package:boxes/responsive.dart';
 import 'package:boxes/services/upload_service.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:boxes/utils/calculation.dart';
@@ -23,7 +24,7 @@ class UploadMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final _mediaQuery = MediaQuery.of(context);
     final _top = _mediaQuery.padding.top + 65;
-    final _right = kDefaultPadding * 2.5 + (showPreview ? 300 : 0);
+    final _right = showPreview ? 300.0 : 0.0;
     return Stack(
       children: <Widget>[
         Positioned.fill(
@@ -59,20 +60,28 @@ class _Menu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
+    final _margin =
+        Responsive.isDesktop(context) ? kDefaultPadding * 2.5 : kDefaultPadding;
+    final _mediaQuery = MediaQuery.of(context);
+    final _maxWidth = _mediaQuery.size.width > 400.0 + _margin * 2
+        ? 400.0
+        : _mediaQuery.size.width - 2 * _margin;
     return Positioned(
       top: _top,
       right: _right,
       child: Material(
         color: Colors.transparent,
         child: Container(
+          margin: EdgeInsets.symmetric(horizontal: _margin),
           padding: EdgeInsets.all(kDefaultPadding),
-          constraints: BoxConstraints(maxWidth: 400, maxHeight: 400),
+          constraints: BoxConstraints(maxWidth: _maxWidth, maxHeight: 400),
           decoration: BoxDecoration(
-            color: kBgLightColor,
+            color: _theme.cardColor,
             borderRadius: BorderRadius.circular(kDefaultPadding * .5),
             boxShadow: [
               BoxShadow(
-                  color: kBgDarkColor,
+                  color: _theme.backgroundColor,
                   offset: Offset(-10, 10),
                   blurRadius: 25.0)
             ],
@@ -171,7 +180,7 @@ class _UploadItem extends StatelessWidget {
               total: _d.fileSize,
             ),
             SizedBox(width: kDefaultPadding * .5),
-            _d.status == UploadStatus.finsh
+            _d.status == UploadStatus.finish
                 ? Icon(
                     Icons.done_rounded,
                     size: 12,
@@ -202,6 +211,7 @@ class _UploadPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -216,7 +226,7 @@ class _UploadPanel extends StatelessWidget {
             Icon(
               CupertinoIcons.cloud_upload,
               size: 16,
-              color: kPrimaryColor,
+              color: _theme.primaryColor,
             ),
             SizedBox(width: kDefaultPadding * .5),
             RichText(
@@ -225,7 +235,7 @@ class _UploadPanel extends StatelessWidget {
                 children: [
                   TextSpan(
                       text: 'Drag and drop',
-                      style: TextStyle(color: kPrimaryColor)),
+                      style: TextStyle(color: _theme.primaryColor)),
                   TextSpan(
                       text: ' or browse files',
                       style: TextStyle(
@@ -247,6 +257,7 @@ class _ProgressBar extends StatelessWidget {
   const _ProgressBar({this.total = 1, this.step = 0});
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     final _fontSize = 8.0;
     final _barHeight = 4.0;
     final _radius = _barHeight / 2;
@@ -258,7 +269,7 @@ class _ProgressBar extends StatelessWidget {
             height: _barHeight,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: kBgDarkColor,
+              color: _theme.backgroundColor,
               borderRadius: BorderRadius.circular(_radius),
             ),
             child: FractionallySizedBox(
@@ -266,7 +277,7 @@ class _ProgressBar extends StatelessWidget {
               widthFactor: _p == 0 ? 0.001 : _p,
               child: Container(
                 decoration: BoxDecoration(
-                  color: kPrimaryColor,
+                  color: _theme.primaryColor,
                   borderRadius: BorderRadius.circular(_radius),
                 ),
               ),

@@ -2,6 +2,7 @@ import 'package:boxes/screens/file_soucre/file_source.dart';
 import 'package:boxes/screens/folder/folder.dart';
 import 'package:boxes/screens/start/start.dart';
 import 'package:boxes/screens/user/account.dart';
+import 'package:boxes/style/colors.dart';
 import 'package:boxes/utils/platform_config.dart';
 import 'package:flutter/foundation.dart';
 
@@ -46,8 +47,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Boxes',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData.light(),
-        darkTheme: ThemeData.dark(),
+        theme: AppStyle.lightTheme,
+        darkTheme: AppStyle.darkTheme,
+        themeMode: ThemeMode.system,
         onGenerateRoute: (RouteSettings settings) {
           //print('build route for ${settings.name}');
           var routes = <String, WidgetBuilder>{

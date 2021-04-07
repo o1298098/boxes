@@ -60,6 +60,7 @@ class _DriveCellState extends State<DriveCell> {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return GestureDetector(
       onTap: () => widget.onTap(_drive),
       child: Container(
@@ -67,7 +68,8 @@ class _DriveCellState extends State<DriveCell> {
         height: 200,
         padding: EdgeInsets.all(kDefaultPadding * .6),
         decoration: BoxDecoration(
-          color: kBgLightColor,
+          color: _theme.cardColor,
+          border: Border.all(color: _theme.colorScheme.surface.withAlpha(100)),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -81,7 +83,7 @@ class _DriveCellState extends State<DriveCell> {
                   height: 35,
                   padding: EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: kBgDarkColor.withAlpha(150),
+                    color: _theme.backgroundColor.withAlpha(150),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: SvgPicture.asset(
@@ -100,7 +102,6 @@ class _DriveCellState extends State<DriveCell> {
             Text(
               _drive?.driveType?.name ?? '',
               style: TextStyle(
-                color: Colors.white,
                 fontWeight: FontWeight.w500,
                 fontSize: 12,
               ),
@@ -123,6 +124,7 @@ class _ProgressBar extends StatelessWidget {
   const _ProgressBar({this.total = 15, this.used = 4});
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     final _fontSize = 8.0;
     final _barHeight = 4.0;
     final _radius = _barHeight / 2;
@@ -138,7 +140,7 @@ class _ProgressBar extends StatelessWidget {
             Spacer(),
             Text(
               '${Calcuation.filesize(total)}',
-              style: TextStyle(fontSize: _fontSize, color: Colors.white),
+              style: TextStyle(fontSize: _fontSize),
             )
           ],
         ),
@@ -147,7 +149,7 @@ class _ProgressBar extends StatelessWidget {
           height: _barHeight,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: kBgDarkColor,
+            color: _theme.backgroundColor,
             borderRadius: BorderRadius.circular(_radius),
           ),
           child: FractionallySizedBox(
@@ -155,7 +157,7 @@ class _ProgressBar extends StatelessWidget {
             widthFactor: _p == 0 ? 0.001 : _p,
             child: Container(
               decoration: BoxDecoration(
-                color: kPrimaryColor,
+                color: _theme.primaryColor,
                 borderRadius: BorderRadius.circular(_radius),
               ),
             ),

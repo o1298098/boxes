@@ -41,6 +41,7 @@ class FolderGrid extends StatelessWidget {
 class _FolderGridShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
         mainAxisExtent: 120,
@@ -53,27 +54,27 @@ class _FolderGridShimmer extends StatelessWidget {
                 padding: EdgeInsets.all(kDefaultPadding),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: kBgLightColor,
+                  color: _theme.cardColor,
                 ),
                 child: Shimmer.fromColors(
-                  baseColor: kBgDarkColor,
-                  highlightColor: kBgLightColor,
+                  baseColor: _theme.backgroundColor,
+                  highlightColor: _theme.cardColor,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Icon(
                         FontAwesomeIcons.solidFolder,
-                        color: kBgDarkColor,
+                        color: _theme.backgroundColor,
                       ),
                       Spacer(),
                       Container(
-                        color: kBgDarkColor,
+                        color: _theme.backgroundColor,
                         width: 100,
                         height: 12,
                       ),
                       SizedBox(height: 6),
                       Container(
-                        color: kBgDarkColor,
+                        color: _theme.backgroundColor,
                         width: 40,
                         height: 10,
                       ),

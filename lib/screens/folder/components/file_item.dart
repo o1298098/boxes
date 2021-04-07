@@ -38,13 +38,14 @@ class _FileItemState extends State<FileItem> {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     final double _radius = 10.0;
     return GestureDetector(
       onTap: () => widget.onTap(_file),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(_radius),
         child: Container(
-          color: kBgLightColor,
+          color: _theme.cardColor,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -60,15 +61,14 @@ class _FileItemState extends State<FileItem> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFFFFFFFF),
                     ),
                   ),
                 ),
               ),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: kDefaultPadding),
-                height: 2,
-                color: Color(0xFF323239),
+                height: 1.5,
+                color: _theme.colorScheme.surface,
               ),
               Expanded(
                 child: Padding(
@@ -85,7 +85,6 @@ class _FileItemState extends State<FileItem> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFFFFFFFF),
                             ),
                           ),
                           SizedBox(height: 4),
@@ -124,6 +123,7 @@ class _TopPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Container(
       constraints: BoxConstraints(maxWidth: 280, maxHeight: 150),
       child: Stack(
@@ -136,7 +136,7 @@ class _TopPanel extends StatelessWidget {
             height: double.infinity,
             padding: EdgeInsets.all(kDefaultPadding * .8),
             color: _file.thumbnailLink != null
-                ? Color(0xFF000000).withOpacity(.2)
+                ? _theme.cardColor.withOpacity(.2)
                 : null,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,12 +144,12 @@ class _TopPanel extends StatelessWidget {
               children: [
                 Icon(
                   FontAwesomeIcons.star,
-                  color: Color(0xFFFFFFFF),
+                  color: _theme.colorScheme.primary,
                   size: 14,
                 ),
                 Icon(
                   Icons.more_vert_rounded,
-                  color: Color(0xFFFFFFFF),
+                  color: _theme.colorScheme.primary,
                   size: 18,
                 ),
               ],
