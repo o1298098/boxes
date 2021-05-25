@@ -42,67 +42,73 @@ class _FileItemState extends State<FileItem> {
     final double _radius = 10.0;
     return GestureDetector(
       onTap: () => widget.onTap(_file),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(_radius),
-        child: Container(
-          color: _theme.cardColor,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _TopPanel(file: _file, token: widget.token),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: kDefaultPadding),
-                height: 60,
-                child: Center(
-                  child: Text(
-                    widget.file.name,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+      child: PhysicalModel(
+        color: _theme.colorScheme.surface.withAlpha(100),
+        elevation: 2.0,
+        shadowColor: _theme.colorScheme.surface.withAlpha(100),
+        borderRadius: BorderRadius.circular(20),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(_radius),
+          child: Container(
+            color: _theme.cardColor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _TopPanel(file: _file, token: widget.token),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                  height: 60,
+                  child: Center(
+                    child: Text(
+                      widget.file.name,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: kDefaultPadding),
-                height: 1.5,
-                color: _theme.colorScheme.surface,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: kDefaultPadding),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Filesize:',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            Calcuation.filesize(_file.size ?? 0),
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFFC0C0C0),
-                            ),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                  height: 1.5,
+                  color: _theme.colorScheme.surface,
                 ),
-              )
-            ],
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: kDefaultPadding),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Filesize:',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              Calcuation.filesize(_file.size ?? 0),
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFFC0C0C0),
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

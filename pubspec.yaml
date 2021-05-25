@@ -48,6 +48,7 @@ dependencies:
   cached_network_image: ^2.5.0
   flutter_svg: ^0.19.3
   sqflite: ^2.0.0+3
+  sqflite_common_ffi: ^2.0.0
   path: ^1.8.0
   fluttertoast: ^8.0.3
   video_player: ^2.1.0

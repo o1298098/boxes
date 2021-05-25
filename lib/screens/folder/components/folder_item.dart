@@ -18,6 +18,7 @@ class FolderItem extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(kDefaultPadding),
         decoration: BoxDecoration(
+          border: Border.all(color: _theme.colorScheme.surface.withAlpha(100)),
           borderRadius: BorderRadius.circular(10),
           color: _theme.cardColor,
         ),

@@ -91,7 +91,7 @@ class _Menu extends StatelessWidget {
             children: [
               Text(
                 'Upload',
-                style: TextStyle(fontSize: 16, color: const Color(0xFFFFFFFF)),
+                style: TextStyle(fontSize: 16),
               ),
               SizedBox(height: kDefaultPadding),
               _UploadPanel(onTap: onUpload),
@@ -120,6 +120,7 @@ class _UploadList extends StatelessWidget {
   final Function(FileUpload) onCancel;
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return Expanded(
       child: Observer(
         builder: (_) => ListView.separated(
@@ -131,7 +132,7 @@ class _UploadList extends StatelessWidget {
             );
           },
           separatorBuilder: (_, index) => Divider(
-            color: kLineColor,
+            color: _theme.colorScheme.surface,
             height: kDefaultPadding * 1.2,
           ),
           itemCount: queue.length,
@@ -217,7 +218,7 @@ class _UploadPanel extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(kDefaultPadding),
         decoration: BoxDecoration(
-          border: Border.all(color: kLineColor),
+          border: Border.all(color: _theme.colorScheme.surface),
           borderRadius: BorderRadius.circular(.5 * kDefaultPadding),
         ),
         child: Row(
@@ -239,7 +240,7 @@ class _UploadPanel extends StatelessWidget {
                   TextSpan(
                       text: ' or browse files',
                       style: TextStyle(
-                        color: const Color(0xFFFFFFFF),
+                        color: _theme.textTheme.bodyText1.color,
                       ))
                 ],
               ),

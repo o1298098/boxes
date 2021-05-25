@@ -1,6 +1,7 @@
 import 'package:boxes/screens/folder/folder_store.dart';
 import 'package:boxes/style/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 
 class CreateFolderDialog extends StatefulWidget {
   final FolderStore store;
@@ -28,7 +29,7 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
     super.dispose();
   }
 
-  _submit() async {
+  _submit(BuildContext context) async {
     _focusNode.unfocus();
     final _name = _controller.text ?? '';
     if (_name.isEmpty) return;
@@ -50,7 +51,10 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
     return SimpleDialog(
       backgroundColor: _theme.cardColor,
       titleTextStyle: TextStyle(fontSize: 16),
-      title: const Text('Create Folder'),
+      title: Text(
+        'Create Folder',
+        style: TextStyle(color: _theme.textTheme.bodyText1.color),
+      ),
       contentPadding: EdgeInsets.all(kDefaultPadding),
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(kDefaultPadding * .5)),
@@ -71,8 +75,13 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
                 : ElevatedButton(
                     style:
                         ElevatedButton.styleFrom(primary: _theme.primaryColor),
-                    onPressed: () => _submit(),
-                    child: const Text('ok'),
+                    onPressed: () => _submit(context),
+                    child: const Text(
+                      'ok',
+                      style: const TextStyle(
+                        color: const Color(0xFFFFFFFF),
+                      ),
+                    ),
                   ),
           ),
         ),
