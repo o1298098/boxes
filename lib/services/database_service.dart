@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:boxes/models/drive_file.dart';
 import 'package:boxes/models/models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -19,8 +22,10 @@ class DatabaseService {
   final _uploadTable = 'uploadFiles';
   final _driveTable = 'drives';
   initDatabase() async {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
+    if (!kIsWeb && (Platform.isWindows || Platform.isLinux)) {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+    }
     //deleteDatabase(join(await getDatabasesPath(), 'boxes_database.db'));
     database = openDatabase(
       join(await getDatabasesPath(), 'boxes_database.db'),
